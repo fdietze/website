@@ -2,7 +2,7 @@
 Goal: Manupulation resistant quality assurance for open and distributed communities that collaboratively work on a distributed artifact.
 
 ## Distributed communities, same type of artifact
-There are multiple "communities" which collaborate on the same type of artifact. It can be imagined similarly to multiple forks of the same git repository, where every fork has a different group of maintainers. The contents of the individual repositories can diverge, but are compatible in the sense that they share the same git root commit.
+There are multiple "communities" which collaborate on the same type of artifact. It can be imagined similarly to multiple forks of the same git repository, where every fork has a different group of maintainers. The contents of the individual repositories can diverge, but are compatible in the sense that they work on the same data structure with the same possible change actions and share the same "root commit".
 
 ## Distributed vs Centralized
 This distrubuted approach can be used in a centralized manner, by disallowing the creation of new communities (forks) of that same artifact, if technically feasible.
@@ -15,7 +15,7 @@ In a community, every participant can propose changes to the artifact. Every cha
 Other members of the community can vote positively or negatively on the proposed change. The votes are weighted according to the voter's reputation (more reputation means more voting weight). 
 Possible Attack: create many accounts, every account does one good change to gain some voting weight. Then all those accounts together can outvote high reputation members. This is hard to automate, because the proposed changes need to be useful.
 Possible Mitigations:
-- Reputation has quadratic influence on voting weight. Therefore it takes a very high number low-reputation accounts to outvote a high-reputation account. And a lot of good changes need to be accepted on the way.
+- Reputation has quadratic influence on voting weight, such that few votes of high-reputation accounts are worth more than many votes of low-reputation accounts. Therefore, to outvote a high-reputation account, it takes either a VERY high number low-reputation accounts or another high-reputation account. And a lot of good changes need to be accepted on the way to create these accounts.
 - Account age influences the weight, such that older accounts have more weight and it's harder to outvote them.
 - Changes can only be accepted if at least one account with a reputation above a certain threshold participated. This way, many low-reputation accounts cannot accept changes alone.
 - The voting weight for a reputation below a certain threshold is zero: Accounts need more than one approved change to gain voting power.
