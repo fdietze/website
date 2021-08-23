@@ -1,6 +1,6 @@
 # Improving the Hacker News Ranking Algorithm (Part 1)
 
-In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws that make it perform worse than it could.
+In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws that make it perform worse than it could:
 
 1. If a submission lands on the front-page, the number of upvotes it receives does not correlate with its quality. Independent of submission time, weekday, or clickbait titles.
 2. There are false negatives. Some high quality submissions do not receive any upvotes because they are overlooked on the fast-moving new-page.
@@ -9,7 +9,7 @@ In our opinion, the goal of Hacker News (HN) is to find the highest quality subm
 Let's look at these two issues in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery]((https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news)), which we access via this [Kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). We also provide the SQL queries for reproduction and further exploration.
 
 
-## Number of upvotes does not correlate with quality
+## Number of Upvotes does not Correlate with Quality
 
 We don't have a good definition for quality, except that users upvote submissions which they think are of high quality. But even high quality submissions get an inconsistent amount of upvotes. We have some data to back up this claim. Since HN allows URLs to be submitted multiple times, we can look at how many upvotes every submission of the same URL received. Note that submissions need at least two upvotes on the new-page to appear on the front-page and every submission starts with 1 point (submitters upvote). Points are called score in the dataset. Let's look at URLs which have been submitted at least four times with the same title during 30 days where every submission got enough votes to show up on the front-page:
 
@@ -119,7 +119,7 @@ Note: We understand that the standard deviation of time-of-day should ideally be
 We observe that even for submissions submitted at the same time-of-day, the scores are inconsistent. This means that in general, score does not correlate well with quality. And we conclude that a low score of a single submission is not a good indicator for low quality.
 
 
-## High Quality Content gets overlooked
+## High Quality Content gets Overlooked
 
 For a submission to be shown on the front-page, it needs to receive at least two upvotes (in addition to the submitter's vote). But most submissions don't get any upvotes at all. Here is a distribution of upvote counts for all submissions on HN:
 
@@ -274,14 +274,15 @@ This means, that **despite differences in the quality of submissions, random sub
 ![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
 
 
-# How can the ranking algorithm be improved?
+# How can the Ranking Algorithm be Improved?
 
 We're working on alternative solutions with the following goals in mind:
 - The algorithm should not produce false negatives, the community should find ALL high-quality content.
 - Scores should correlate with quality so that submissions can be compared
-- The front-page should have at least the quality it has today
+- The quality of content on a future version of the front-page should be at least as high as on the current version of the front-page
 - The user-interface should stay exactly the same
 - The age penalty should behave the same way as it was designed
+- Bonus: A higher overall quality on the frontpage
 - Bonus: Make it more difficult to game the system
 
 
