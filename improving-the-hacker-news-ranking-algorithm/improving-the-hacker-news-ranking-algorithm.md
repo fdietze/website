@@ -241,15 +241,15 @@ The new-page is showing the latest submissions, ordered by submission time. To c
 rankingScore = pow(upvotes, 0.8) / pow(ageHours + 2, 1.8)
 ```
 
-To understand the formula, let's oversimplify it. An exponent of `0.8` is almost linear, and an exponent of `1.8` is almost quadratic. We also ignore the `+ 2`:
+To understand the formula, let's oversimplify it. An exponent of `0.8` is almost linear and an exponent of `1.8` is almost quadratic. We also ignore the `+ 2`:
 
 ```
 upvotes / ageHours^2
 ```
 
-It means that the submissions on the front-page are basically ordered by their number of upvotes with an quadratic age penalty. At the age of 2 hours, the upvotes count only as `1/2^2 = 1/4 = 25%`, after 5 hours only `1/5^2 = 1/25 = 4%` and after 25 hours a submission's score counts just `1/25^2 = 1/625 = 0.16%`.
+It means that the submissions on the front-page are basically ordered by their number of upvotes with a quadratic age penalty. At the age of 2 hours, the upvotes count only as `1/2^2 = 1/4 = 25%`, after 5 hours only `1/5^2 = 1/25 = 4%` and after 25 hours a submission's score counts just `1/25^2 = 1/625 = 0.16%`.
 
-Let's imagine a front-page, where all submissions have the **same quality** and were submitted at exactly the **same time**. The front-page would just sort the submissions by their number of votes, because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
+Let's imagine a front-page where all submissions have the **same quality** and were submitted at exactly the **same time**. The front-page would just sort the submissions by their number of votes because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
 
 ![Positive Feedback loop. 3 Bubbles pointing at each other in a circle: "views" points to "upvotes", points to "rank", points to views, a bubble "age" pointing with a minus-sign at "rank".](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
 
@@ -257,18 +257,18 @@ Let's imagine a front-page, where all submissions have the **same quality** and 
 
 If many submissions compete for upvotes, the positive feedback loop creates a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
 
-Every user acts on its own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a random distribution, where higher ranks receive more views than lower ranks (see graphic below, it was created using the [HN API](https://github.com/HackerNews/API) and observing score changes on every rank. The code will be published in the future).
+Every user acts on their own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a distribution where higher ranks receive more views than lower ranks (see graphic below, it was created using the [HN API](https://github.com/HackerNews/API) and observing score changes on every rank. The code will be published in the future).
 
-Let's imagine the just mentioned front-page in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank, increases the upvote count of that specific submission and pushes it to the top of the list. Now, that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
+Let's imagine the just mentioned front-page in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank increases the upvote count of that specific submission and pushes it to the top of the list. Now, that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
 If we run a second experiment and the first vote randomly hits a different rank and submission, then that specific submission has a better chance to get more upvotes. After many votes the ranking stabilizes and the high ranking submissions stay at high ranks while the lower ranked ones stay at lower ranks, without any chance to reach a high rank again.
 
 Which submissions stabilize at high ranks depends on where the early votes land, which is completely random. This means that random submissions get high stable ranks even though they have the same quality.
 
-With submissions **submitted at different points in time**, the age penalty kicks in and pulls stabilized random submissions back down. This allows other random rich submissions to exploit their feedback loop, get richer and move up to higher ranks.
+With submissions **submitted at different points in time**, the age penalty kicks in and pulls stabilized random submissions back down. This allows other random rich submissions to exploit their feedback loop, get richer, and move up to higher ranks.
 
-Now let's put everything back together and imagine submissions with **different qualities** on the front-page. A higher quality submission sitting on the same rank as a lower quality submission should get slightly more upvotes, because more users identify it's quality and vote on it. But in reality, two submissions can not have the same rank. One of the two submissions is ranked higher and therefore receives more views and upvotes. The difference in quality is not strong enough to outperform the different amount of votes coming in on different ranks.
+Now let's put everything back together and imagine submissions with **different qualities** on the front-page. A higher quality submission sitting on the same rank as a lower quality submission should get slightly more upvotes, because more users identify its quality and vote on it. But in reality, two submissions cannot have the same rank. One of the two submissions is ranked higher and therefore receives more views and upvotes. The difference in quality is not strong enough to outperform the different amount of votes coming in on different ranks.
 
-This means, that **despite differences in the quality of submissions, random submissions rise to the top of the front-page**. Therefore, the number of votes does not correlate with a submission's quality. This is a very strong claim. Additionally, to the data shown before, we're working on confirming this claim with a simulated front-page and will write about it in the future.
+This means, that **despite differences in the quality of submissions, random submissions rise to the top of the front-page**. Therefore, the number of votes does not correlate with a submission's quality. This is a very strong claim. Additionally to the data shown before, we're working on confirming this claim with a simulated front-page and will write about it in the future.
 
 
 ![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
@@ -285,7 +285,7 @@ We're working on alternative solutions with the following goals in mind:
 - Bonus: Make it more difficult to game the system
 
 
-**The core idea of our approaches is to balance the positive feedback loop, such that instead of the rich get richer and rise to the top, the highest quality rises to the top.**
+**The core idea of our approaches is to balance the positive feedback loop, such that instead of the rich getting richer and rising to the top, the highest quality rises to the top.**
 
 There are many ways to do this. In our opinion, the following is the most promising one that can be implemented in Hacker News:
 
@@ -305,11 +305,11 @@ This would solve the upvote ~ quality correlation problem on the front-page. But
 
 The purpose of the new-page is to act as an initial filter and separate good from bad quality submissions. To achieve this goal, the new-page should expose every submission to a certain amount of views, to estimate its eligibility for the front-page.
 
-To fulfill this purpose without false negatives, we propose to use the same front-page formula on the new-page. In this case the new-page would look almost the same as the front-page where high quality submissions are at the top. To unclutter the new-page and make room for new submissions, there could be an upvote threshold, above which submissions are shown on the front-page and below submissions are shown on the new-page.
+To fulfill this purpose without false negatives, we propose to use the same front-page formula on the new-page. In this case the new-page would look almost the same as the front-page where high quality submissions are at the top. To unclutter the new-page and make room for new submissions, there could be an upvote threshold, above which submissions are shown on the front-page and below which submissions are shown on the new-page.
 
 We want to verify with simulations, if our proposal indeed meets the goals of Hacker News. In addition to that, we want to try other algorithms and see how those compare.
 
-Other balancing feedback loop formulas, we came up with, are:
+Other balancing feedback loop formulas we came up with are:
 
 Only downvotes:
 ```
