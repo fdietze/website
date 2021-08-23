@@ -1,14 +1,15 @@
 # Improving the Hacker News ranking algorithm
 
-As we see it, the goal of Hacker News is to find the highest quality submissions (according to its community) and show them on the frontpage. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws that make it perform worse than it could.
+In our opinion, the goal of Hacker News is to find the highest quality submissions (according to its community) and show them on the frontpage. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws that make it perform worse than it could.
 
 1. If a submission lands on the front-page, the number of upvotes it receives does not correlate with it's quality. Independent of submission time, weekday or clickbait titles.
-2. There are false negatives. Some high quality submissions do not receive any upvotes, because they are overlooked on the fast-moving 'new'-page. 
+2. There are false negatives. Some high quality submissions do not receive any upvotes, because they are overlooked on the fast-moving 'new'-page.
 
-Let's look at these in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery]((https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news)), which we access via this [kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). We also provide the sql queries for reproduction and further exploration.
+Let's look at these two issues in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery]((https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news)), which we access via this [kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). We also provide the sql queries for reproduction and further exploration.
 
-## Number of upvotes do not correlate wtih quality
-We don't have a good definition for quality, except that users upvote submissions, they think are of high quality. But even high quality submissions get an inconsistent amount of upvotes. We have some data to back up this claim. Since HN allows urls to be submitted multiple times, we can look at how many upvotes every submission of the same url received. Note, that submissions need at least two upvotes on the new-page to appear on the frontpage (SOURCE) and every submission starts with 1 point (submitters upvote, called `score` in the dataset). Let's look at urls which have been submitted at least four times with the same title during 30 days where every submission got enough votes to show up on the frontpage:
+## Number of upvotes does not correlate with quality
+
+We don't have a good definition for quality, except that users upvote submissions, which, they think, are of high quality. But even high quality submissions get an inconsistent amount of upvotes. We have some data to back up this claim. Since HN allows urls to be submitted multiple times, we can look at how many upvotes every submission of the same url received. Note, that submissions need at least two upvotes on the new-page to appear on the frontpage (SOURCE) and every submission starts with 1 point (submitters upvote, called `score` in the dataset). Let's look at urls which have been submitted at least four times with the same title during 30 days where every submission got enough votes to show up on the frontpage:
 
 
 ```sql
@@ -117,6 +118,7 @@ We observe that even for submissions submitted at the same time of day, the scor
 
 
 ## High Quality Content gets overlooked
+
 For a submission to be shown on the front page, it needs to receive at least two upvotes (SOURCE). But most submissions don't get any upvotes at all. Here is a distribution of upvote counts for all submissions on HN:
 
 ```sql
@@ -175,7 +177,7 @@ ORDER BY
 | [2049 4022]      |           103 |        0.000027 |                   0.999998 |        262623 |         0.005485 |
 | [4103 6015]      |             6 |        0.000002 |                   1.000000 |         28574 |         0.000597 |
 
-We observe that almost the half of all submissions did not get any upvote at all. But are these submissions just spam and low-quality submissions? Let's have another look at the data and see if there are high quality urls which have a submission with any upvotes.
+We observe that almost the half of all submissions did not get any upvote at all. But are these submissions just spam and low-quality submissions? Let's have another look at the data and see if there are high quality urls which have a submission without an upvote.
 
 
 ```sql
@@ -243,9 +245,9 @@ To understand the formula, let's oversimplify it. An exponent of `0.8` is almost
 upvotes / ageHours^2
 ```
 
-It means that the submissions on the frontpage are basically ordered by their number of upvotes with an quadratic age penalty. At the age of `2` hours, the upvotes count only as `1/2^2 = 1/4 = 25%`, after 5 hours only `1/5^2 = 1/25 = 4%` and after 25h a submissions's score counts just `1/25^2 = 1/625 = 0.16%`.
+It means that the submissions on the frontpage are basically ordered by their number of upvotes with an quadratic age penalty. At the age of `2` hours, the upvotes count only as `1/2^2 = 1/4 = 25%`, after 5 hours only `1/5^2 = 1/25 = 4%` and after 25 hours a submissions's score counts just `1/25^2 = 1/625 = 0.16%`.
 
-Let's imagine a frontpage, where all submissions have the same quality and were submitted at exactly the same time. The frontpage would just sort the submissions by their number of votes, because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback). If many positive feedback loops compete, like the individual submissions compete for upvotes, we can observe a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
+Let's imagine a frontpage, where all submissions have the same quality and were submitted at exactly the same time. The frontpage would just sort the submissions by their number of votes, because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback). If many positive feedback loops compete, like in our case with the individual submissions competing for upvotes, we can observe a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
 
 Every user acts on it's own and decides when to visit the frontpage and which submissions to vote on. If we imagine thousands of users looking at the frontpage, the views and votes on the ranks follow a random distribution, where higher ranks receive more views than lower ranks.
 
@@ -253,7 +255,7 @@ TODO: graphic for distribution of ranks on the frontpage
 
 Let's imagine the just mentioned frontpage in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank, increases the upvote count of that specific submission and pushes it to the top of the list. Now that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
 
-If we run a second experiment and the first vote randomly hits a different rank and submission, now that specific submission has a better chance to get more upvotes. After many votes the ranking stabilizes and the high ranking submissions stay at high ranks while the lower ranked ones stay at lower ranks, without any chance to reach a high rank again.
+If we run a second experiment and the first vote randomly hits a different rank and submission, then that specific submission has a better chance to get more upvotes. After many votes the ranking stabilizes and the high ranking submissions stay at high ranks while the lower ranked ones stay at lower ranks, without any chance to reach a high rank again.
 
 Which submissions stabilize at high ranks depends on where the early votes land, which is completely random. This means that random submissions get high stable ranks even though they have the same quality.
 
@@ -273,7 +275,7 @@ We're working on alternative solutions with the following goals:
 - The age penalty should behave the same way as it was designed
 - Bonus: Make it more difficult to game the system
 
-The core idea of our approach is to break the positive feedback loop, such that instead of the rich get richer and rise to the top, the highest quality rises to the top instead.
+The core idea of our approach is to break the positive feedback loop, such that instead of the rich get richer and rise to the top, the highest quality rises to the top.
 
 The feedback loop of every submission has three stocks:
 `Higher Rank` -> `More Views` -> `More Votes`.
@@ -290,9 +292,7 @@ rankingScore = pow(upvotes, 0.8) / pow(ageHours + 2, 1.8) / views
 
 But doing this change on the front-page would lower its overall quality, since submissions with few views rise to the top to gain more votes and views to estimate their quality.
 
-This is a behavior we want to see on the new-page, where high quality content should be separated from low quality content. That's why we propose to use this algorithm on the new-page.
+This is a behavior we want to see on the new-page, where high quality content should be separated from low quality content. That's why we propose to use this formula on the new-page.
 
 And to keep the high quality on the frontpage, the frontpage uses the same forumla, but with a little upvote threshold it already has today (2 upvotes). The exact threshold is yet to be determined.
-
-
 
