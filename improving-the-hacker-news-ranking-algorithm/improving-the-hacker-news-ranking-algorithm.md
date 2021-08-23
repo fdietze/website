@@ -249,7 +249,9 @@ It means that the submissions on the frontpage are basically ordered by their nu
 
 Let's imagine a frontpage, where all submissions have the **same quality** and were **submitted at exactly the same time**. The frontpage would just sort the submissions by their number of votes, because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
 
-![Positive Feedback loop. 3 Bubbles pointing at each other in a circle: views -> upvotes -> rank -> ... / age pointing with a negative arrow at rank.](feedback-loop.svg)
+![Positive Feedback loop. 3 Bubbles pointing at each other in a circle: views -> upvotes -> rank -> ... / age pointing with a negative arrow at rank.](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
+
+
 
 If many submissions compete for upvotes, the positive feedback loop creates a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
 
@@ -267,7 +269,7 @@ Now let's put everything back together and imagine submissions with **different 
 
 That means, **despite quality differences in the submissions, random submissions rise to the top of the frontpage**. Therefore the number of votes does not correlate with a submission's quality. This is a very strong claim. Additionally to the data shown before, we're working on confirming this claim with a simulated frontpage and will write about it in the future.
 
-![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](votehist.svg)
+![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
 
 
 # How can the ranking algorithm be improved?
@@ -295,7 +297,7 @@ rankingScore = ------------------------------------------
                                 views + 1
 ```
 
-![Balancing Positive Feedback loop. 3 Bubbles pointing at each other in a circle: views -> upvotes -> rank -> ... / age pointing with a negative arrow at rank. Views additionally points negatively to rank.](feedback-loop-balanced.svg)
+![Balancing Positive Feedback loop. 3 Bubbles pointing at each other in a circle: views -> upvotes -> rank -> ... / age pointing with a negative arrow at rank. Views additionally points negatively to rank.](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop-balanced.svg)
 
 This would solve the upvote ~ quality correlation problem on the frontpage. But high quality submissions can still be overlooked on the new-page (false negatives).
 
