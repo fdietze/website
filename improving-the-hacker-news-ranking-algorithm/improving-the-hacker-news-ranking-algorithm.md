@@ -4,13 +4,13 @@
 
 <felix.dietze@rwth-aachen.de>, <nakayama@comm.rwth-aachen.de>
 
-In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws that make it perform worse than it could:
+In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws:
 
 1. If a submission lands on the front-page, the number of upvotes it receives does not correlate with its quality. Independent of submission time, weekday, or clickbait titles.
 2. There are false negatives. Some high quality submissions do not receive any upvotes because they are overlooked on the fast-moving new-page.
 
 
-Let's look at these two issues in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery](https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news), which we access via this [Kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). We also provide the SQL queries for reproduction and further exploration in the Appendix.
+Let's look at these two issues in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery](https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news), which we access via this [Kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). You can find the SQL queries for reproduction and further exploration in the Appendix.
 
 
 ## Number of Upvotes does not Correlate with Quality
@@ -86,7 +86,7 @@ We observe that even for submissions submitted at the same time-of-day, the scor
 
 ## High Quality Content gets Overlooked
 
-For a submission to be shown on the front-page, it needs to receive at least two upvotes (in addition to the submitter's vote). But most submissions don't get any upvotes at all. Here is a distribution of upvote counts for all submissions on HN. Take minute to understand how to read the first two columns of this table. They answer questions like: How many submissions got between 3 and 4 upvotes?
+For a submission to be shown on the front-page, it needs to receive at least two upvotes (in addition to the submitter's vote). But most submissions don't get any upvotes at all. Here is a distribution of upvote counts for all submissions on Hacker News. Take minute to understand how to read the first two columns of this table. They answer questions like: How many submissions received between 3 and 4 upvotes?
 
 
 | score_interval   |   submissions |   subm_fraction |   cumulative_subm_fraction |   total_votes |   votes_fraction |
@@ -146,7 +146,7 @@ But are these submissions just spam and low-quality submissions? Let's have anot
 | The Refragmentation                                                              | [852   2   4   3   1]                     |
 | Things I Learnt from a Senior Software Engineer                                  | [  1 849]                                 |
 
-We observe that there are indeed very high quality URLs that have been overlooked at least once on the new-page. This means that zero upvotes do not necessarily mean low quality. We do have false negatives among our zero upvote submissions.
+We observe that there are indeed very high quality URLs that have been overlooked at least once on the new-page. This means that zero upvotes do not necessarily mean low quality. Zero upvotes mean uncertainty. But this uncertainty looks the same as low quality for the ranking algorithm and therefore gets penalized. This analysis shows that we do have false negatives with potential high quality among our zero upvote submissions.
 
 # Why does this happen?
 
@@ -154,7 +154,7 @@ Explaining overlooked submissions on the new-page is simple: Not enough people l
 
 Explaining the score inconsistency for submissions that all appeared on the front-page is a bit more complicated. Let's understand the current ranking algorithm first.
 
-The new-page is showing the latest submissions, ordered by submission time. To calculate the front-page, the algorithm takes the newest 1500 submissions which have at least two upvotes, applies the ranking formula and sorts by the formula value. Here is the [formula](https://medium.com/hacking-and-gonzo/how-hacker-news-ranking-algorithm-works-1d9b0cf2c08d):
+The new-page is showing the latest submissions, ordered by submission time. To calculate the front-page, the algorithm takes the newest 1500 submissions which have at least two upvotes, applies the ranking formula and sorts by the resulting value. Here is the [formula](https://medium.com/hacking-and-gonzo/how-hacker-news-ranking-algorithm-works-1d9b0cf2c08d):
 
 ```
 rankingScore = pow(upvotes, 0.8) / pow(ageHours + 2, 1.8)
@@ -168,9 +168,9 @@ upvotes / ageHours^2
 
 It means that the submissions on the front-page are basically ordered by their number of upvotes with a quadratic age penalty. At the age of 2 hours, the upvotes count only as `1/2^2 = 1/4 = 25%`, after 5 hours only `1/5^2 = 1/25 = 4%` and after 25 hours a submission's score counts just `1/25^2 = 1/625 = 0.16%`.
 
-Let's imagine a front-page where all submissions have the **same quality** and were submitted at exactly the **same time**. The front-page would just sort the submissions by their number of votes because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
+Now let's imagine a front-page where all submissions have **exactly the same quality** and were submitted at **exactly the same time**. The front-page would just sort the submissions by their number of votes because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
 
-![Positive Feedback loop. 3 Bubbles pointing at each other in a circle: "views" points to "upvotes", points to "rank", points to views, a bubble "age" pointing with a minus-sign at "rank".](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
+![Positive Feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank".](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
 
 
 
@@ -178,7 +178,7 @@ If many submissions compete for upvotes, the positive feedback loop creates a ri
 
 Every user acts on their own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a distribution where higher ranks receive more views than lower ranks. The graphic was created using the [Hacker News API](https://github.com/HackerNews/API) and observing score changes over time for every rank.
 
-![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
+![Histogram of vote distribution by ranks on the front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and flattening. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
 
 Let's imagine the just mentioned front-page in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank increases the upvote count of that specific submission and pushes it to the top of the list. Now, that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
 
@@ -199,7 +199,7 @@ This means, that **despite differences in the quality of submissions, random sub
 # How can the Ranking Algorithm be Improved?
 
 We're working on alternative solutions with the following goals in mind:
-- The algorithm should not produce false negatives, the community should find ALL high-quality content.
+- The algorithm should not produce false negatives, the community should find **all** high-quality content.
 - Scores should correlate with quality so that submissions can be compared
 - The quality of content on a future version of the front-page should be at least as high as on the current version of the front-page
 - The user-interface should stay exactly the same
@@ -212,7 +212,7 @@ We're working on alternative solutions with the following goals in mind:
 
 There are many ways to do this. In our opinion, the following is the most promising one that can be implemented in Hacker News:
 
-To balance the feedback loop, we add negative feedback: **More views should lead to a lower rank**. It turns the positive feedback loop into a balancing feedback loop that converges on the right amount of votes.
+To balance the feedback loop, we add negative feedback: **More views of a submission should lead to a lower rank**. It turns the positive feedback loop into a **balancing feedback loop** that converges on the right amount of votes.
 
 This can be achieved by normalizing the current ranking formula with the number of views:
 
@@ -222,26 +222,28 @@ rankingScore = ------------------------------------------
                                 views + 1
 ```
 
-![Balancing Positive Feedback loop. 3 Bubbles pointing at each other in a circle: views -> upvotes -> rank -> ... / age pointing with a negative arrow at rank. Views additionally points negatively to rank.](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop-balanced.svg)
+![Balancing Positive Feedback loop. Like in in the previous diagram: three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank". Additionally to the previous diagram, there is an arrow with a minus-sign from "views" to "rank".](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/feedback-loop-balanced.svg)
 
-This would solve the upvote ~ quality correlation problem on the front-page. But high quality submissions can still be overlooked on the new-page (false negatives).
+This would solve the upvote vs quality correlation problem on the front-page. But high quality submissions can still be overlooked on the new-page (false negatives).
 
 The purpose of the new-page is to act as an initial filter and separate good from bad quality submissions. To achieve this goal, the new-page should expose every submission to a certain amount of views, to estimate its eligibility for the front-page.
 
 To fulfill this purpose without false negatives, we propose to use the same front-page formula on the new-page. In this case the new-page would look almost the same as the front-page where high quality submissions are at the top. To unclutter the new-page and make room for new submissions, there could be an upvote threshold, above which submissions are shown on the front-page and below which submissions are shown on the new-page.
 
+## Early Simulations
+
 We want to verify with simulations, if our proposal indeed meets the goals of Hacker News. In addition to that, we want to try other algorithms and see how those compare. Simplified proof of concept simulations already confirm that it's working as described.
 
-Here are a few plots of our simplified simulations. In these simulations, all submissions are shown immediately on the frontpage and ranked by the formula. There is no new-page. Submissions have a predifined random quality between 0 and 1. Random agents look at the frontpage and vote on submissions based on their quality. The agents look more freqently at higher ranks.
+Here are a few plots of our early, simplified simulations. In these simulations, all submissions are shown immediately on the frontpage and ranked by the formula. There is no new-page. Submissions have a predifined random quality between 0 and 1. Random agents look at the frontpage and vote on submissions based on their quality. The agents look more freqently at higher ranks.
 
 ### Original Hacker News formula
-![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-upvote-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-120). The points roughly describe a filled triangle from (0 quality,0 upvotes) over (1 quality, 0 upvotes) to about (1 quality, 40 upvotes).](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-upvote-quality-scatterplot.png)
 
 Every point is a submission that went through the frontpage simulation. The x-axis shows its predefined quality and the y-axis its upvotes. We can see that higher quality content has the chance to reach higher scores. There are no false positives (low quality content with high score), but there are many false negatives (high quality content with low score). Some outliers have very high scores.
 
 ### Hacker News formula divided by views
 If we use our proposed formula which divides the scoreRank by views, we get the following:
-![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-normalized-upvote-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-35). The points roughly describe a thick fuzzy line from (0 quality,0 upvotes) to about (1 quality, 15 upvotes). There are almost no points in the area below the line (high quality, few upvotes).](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-normalized-upvote-quality-scatterplot.png)
 
 Now there are basically no false-negatives (high quality with low score) anymore and the upvotes correlate much better with quality.
 
@@ -252,16 +254,18 @@ Other interesting balancing feedback loop formulas we came up with are:
 rankingScore = -(downvotes+1) * age
 ```
 
-![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and downvotes on y-axis (-18 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 downvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes).](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
 
-Only having downvotes is very interesting, because it's much harder to promote your own content.
+Only having downvotes has very interesting properties. It's much harder to promote your own content. Also, uncertainty (few votes) gets more attention (higher rank) instead of less, like it does for upvote based systems. 
 
 ### Upvotes with views as downvotes
 ```
 rankingScore = (upvotes-views-1) * age
 ```
 
-![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (-16 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 upvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes). The shape looks very similar to the one with only downvotes.](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
+
+Interestingly, this formula seems to behave very similar to the downvote-only formula. Even though the users still have an upvote button.
 
 # Conclusion and Future Work
 
@@ -269,7 +273,7 @@ We analyzed two problems of the current Hacker News ranking algorithm and confir
 
 We proposed a small modification to the Hacker News ranking formula, which turns the positive feedback loop into a balancing feedback loop: Dividing the result of the formula by the number of views a submission receives.
 
-We already evaluated the effectiveness of this approach with oversimplified proof-of-concept simulations. And the results are quite promising. But there's more work to do. Currently, we're working on a simulation with the goal to behave the same as Hacker News in reality. If we're accurate enough, we can evaluate how different formulas change the resulting front-page. But more on that in the future.
+We already evaluated the effectiveness of this approach with oversimplified proof-of-concept simulations. And the results are quite promising. But there's more work to do. Currently, we're working on a more realistic simulation with the goal to behave the same as Hacker News in reality - including a new-page. If we're accurate enough, we can evaluate how different formulas change the resulting front-page. But more on that in the future.
 
 
 Thanks for reading. We appreciate any feedback and ideas. Please get in touch!
