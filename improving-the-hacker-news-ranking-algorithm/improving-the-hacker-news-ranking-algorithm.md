@@ -1,5 +1,9 @@
 # Improving the Hacker News Ranking Algorithm (Part 1)
 
+*Felix Dietze & Johannes Nakayama, 2021-08*
+
+<felix.dietze@rwth-aachen.de>, <nakayama@comm.rwth-aachen.de>
+
 In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws that make it perform worse than it could:
 
 1. If a submission lands on the front-page, the number of upvotes it receives does not correlate with its quality. Independent of submission time, weekday, or clickbait titles.
@@ -179,8 +183,11 @@ ORDER BY
 | [2049 4022]      |           103 |        0.000027 |                   0.999998 |        262623 |         0.005485 |
 | [4103 6015]      |             6 |        0.000002 |                   1.000000 |         28574 |         0.000597 |
 
-We observe that almost half of all submissions did not get any upvote at all. But are these submissions just spam and low-quality submissions? Let's have another look at the data and see if there are high quality URLs which have a submission without an upvote.
+![Histogram](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/submission_and_votes_distribution_over_score_intervals.svg)
 
+We observe that almost half of all submissions did not get any upvote at all (score = 1). It's also interesting to see that most votes get absorbed by few submissions which are on the frontpage (score 64-1024).
+
+But are these submissions just spam and low-quality submissions? Let's have another look at the data and see if there are high quality URLs which have a submission without an upvote.
 
 ```sql
 SELECT
@@ -308,19 +315,44 @@ The purpose of the new-page is to act as an initial filter and separate good fro
 
 To fulfill this purpose without false negatives, we propose to use the same front-page formula on the new-page. In this case the new-page would look almost the same as the front-page where high quality submissions are at the top. To unclutter the new-page and make room for new submissions, there could be an upvote threshold, above which submissions are shown on the front-page and below which submissions are shown on the new-page.
 
-We want to verify with simulations, if our proposal indeed meets the goals of Hacker News. In addition to that, we want to try other algorithms and see how those compare.
+We want to verify with simulations, if our proposal indeed meets the goals of Hacker News. In addition to that, we want to try other algorithms and see how those compare. Simplified proof of concept simulations already confirm that it's working as described.
 
-Other balancing feedback loop formulas we came up with are:
+Here are a few plots of our simplified simulations. In these simulations, all submissions are shown immediately on the frontpage and ranked by the formula. There is no new-page. Submissions have a predifined random quality between 0 and 1. Random agents look at the frontpage and vote on submissions based on their quality. The agents look more freqently at higher ranks.
+
+Original Hacker News Formula:
+![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-upvote-quality-scatterplot.png)
+
+Every point is a submission that went through the frontpage simulation. The x-axis shows its predefined quality and the y-axis its upvotes. We can see that higher quality content has the chance to reach higher scores. There are no false positives (low quality content with high score), but there are many false negatives (high quality content with low score). Some outliers have very high scores.
+
+If we use our proposed formula which divides the scoreRank by views, we get the following:
+![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-normalized-upvote-quality-scatterplot.png)
+
+Now there are basically no false-negatives (high quality with low score) anymore and the upvotes correlate much better with quality.
+
+Other interesting balancing feedback loop formulas we came up with are:
 
 Only downvotes:
 ```
 rankingScore = -(downvotes+1) * age
 ```
 
+![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
 
 Upvotes with views as downvotes:
 ```
 rankingScore = (upvotes-views-1) * age
 ```
 
-We appreciate any feedback and ideas! Please get in touch: <felix.dietze@rwth-aachen.de>
+![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
+
+# Conclusion and Future Work
+
+We analyzed two problems of the current Hacker News ranking algorithm and confirmed them with data: 1) The number of upvotes does not correlate with quality. 2) High quality submissions are overlooked on the new-page. We explained that the root cause of these problems is the ranking algorithm itself. It introduces a rich-get-richer effect, which lets arbitrary high quality submissions rise to the top, while others don't get much attention. Additionally, the new-page does not get enough votes to identify all high-quality submissions.
+
+We proposed a small modification to the Hacker News ranking formula, which turns the positive feedback loop into a balancing feedback loop: Dividing the result of the formula by the number of views a submission receives.
+
+We already evaluated the effectiveness of this approach with oversimplified proof-of-concept simulations. And the results are quite promising. But there's more work to do. Currently, we're working on a simulation with the goal to behave the same as Hacker News in reality. If we're accurate enough, we can evaluate how different formulas change the resulting front-page. But more on that in the future.
+
+
+Thanks for reading. We appreciate any feedback and ideas. Please get in touch!
+
