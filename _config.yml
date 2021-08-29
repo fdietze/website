@@ -23,7 +23,7 @@ email: felix.dietze@rwth-aachen.de
 description: >- # this means to ignore newlines until "baseurl:"
   Thoughts by Felix Dietze
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://felx.me" # the base hostname & protocol for your site, e.g. http://example.com
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: felixdietze
 github_username:  fdietze
 
