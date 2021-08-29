@@ -10,27 +10,13 @@ In our opinion, the goal of Hacker News (HN) is to find the highest quality subm
 2. There are false negatives. Some high quality submissions do not receive any upvotes because they are overlooked on the fast-moving new-page.
 
 
-Let's look at these two issues in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery]((https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news)), which we access via this [Kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). We also provide the SQL queries for reproduction and further exploration.
+Let's look at these two issues in detail and try to confirm them with data and some systems thinking tools. [All HN submissions are available on BigQuery](https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news), which we access via this [Kaggle notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis). We also provide the SQL queries for reproduction and further exploration in the Appendix.
 
 
 ## Number of Upvotes does not Correlate with Quality
 
-We don't have a good definition for quality, except that users upvote submissions which they think are of high quality. But even high quality submissions get an inconsistent amount of upvotes. We have some data to back up this claim. Since HN allows URLs to be submitted multiple times, we can look at how many upvotes every submission of the same URL received. Note that submissions need at least two upvotes on the new-page to appear on the front-page and every submission starts with 1 point (submitters upvote). Points are called score in the dataset. Let's look at URLs which have been submitted at least four times with the same title during 30 days where every submission got enough votes to show up on the front-page:
+We don't have a good definition for quality, except that users upvote submissions which they think are of high quality. But even high quality submissions get an inconsistent amount of upvotes. We have some data to back up this claim. Since HN allows URLs to be submitted multiple times, we can look at how many upvotes every submission of the same URL received. Note that submissions need at least two upvotes on the new-page to appear on the front-page and every submission starts with 1 upvote (submitters upvote). The number of upvotes is called `score` in the dataset. Let's look at URLs which have been submitted at least four times with the same title during 30 days where every submission got enough votes to show up on the front-page:
 
-
-```sql
--- score = upvotes + 1
-SELECT
-    title,
-    ARRAY_AGG(score order by time ASC) as scores_by_time,
-    DATE_DIFF(DATE(TIMESTAMP_SECONDS(MAX(time))),DATE(TIMESTAMP_SECONDS(MIN(time))), DAY) as days,
-FROM `bigquery-public-data.hacker_news.full`
-WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score >= 3
-GROUP BY url,title
-HAVING COUNT(*) >= 4 AND days <= 30
-ORDER BY max(score) DESC
-LIMIT 30
-```
 
 | title                                                                          | scores_by_time                |
 |:-------------------------------------------------------------------------------|:------------------------------|
@@ -70,32 +56,7 @@ We observe that the scores are inconsistent. Only a few submissions score high. 
 
 Can this observation be explained by different submission times? Let's look at submissions of the same URL with the lowest standard deviation of submission time-of-day.
 
-```sql
-WITH
-    stories AS (
-        SELECT *
-        FROM `bigquery-public-data.hacker_news.full`
-        WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score > 0
-        ORDER BY time DESC
-    )
-SELECT
-    ARRAY_AGG(score ORDER BY time) scores,
-    ARRAY_AGG(EXTRACT(HOUR FROM timestamp) order by time ASC) time_of_day,
-    stddev(EXTRACT(HOUR FROM timestamp)+EXTRACT(MINUTE FROM timestamp)/60) time_of_day_stddev,
-    DATE_DIFF(DATE(TIMESTAMP_SECONDS(MAX(time))),DATE(TIMESTAMP_SECONDS(MIN(time))), DAY) as days,
-FROM stories
-GROUP BY url,title
-HAVING
-    COUNT(*) >= 3 AND COUNT(*) <= 10
-    AND max(score) > 50
-    AND days < 90
-    AND time_of_day_stddev <= 2.5
 
-ORDER BY count(score) DESC, time_of_day_stddev ASC
-LIMIT 20
-```
-
-Note: We understand that the standard deviation of time-of-day should ideally be calculated using a [circular mean](https://en.wikipedia.org/wiki/Circular_mean), but we wanted to keep it simple.
 
 | scores                | time_of_day      |   time_of_day_stddev |
 |:----------------------|:-----------------|---------------------:|
@@ -125,46 +86,8 @@ We observe that even for submissions submitted at the same time-of-day, the scor
 
 ## High Quality Content gets Overlooked
 
-For a submission to be shown on the front-page, it needs to receive at least two upvotes (in addition to the submitter's vote). But most submissions don't get any upvotes at all. Here is a distribution of upvote counts for all submissions on HN:
+For a submission to be shown on the front-page, it needs to receive at least two upvotes (in addition to the submitter's vote). But most submissions don't get any upvotes at all. Here is a distribution of upvote counts for all submissions on HN. Take minute to understand how to read the first two columns of this table. They answer questions like: How many submissions got between 3 and 4 upvotes?
 
-```sql
-WITH
-    stories AS (
-        SELECT *
-        FROM `bigquery-public-data.hacker_news.full`
-        WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score > 0
-    ),
-    intervals AS (    
-        SELECT
-            min(score) as min_score,
-            max(score) as max_score,
-            COUNT(*) as submissions,
-            SUM(score) as total_votes,
-        FROM
-            stories
-        GROUP BY
-            ceil(log(score)/log(2))
-    ),
-    totals AS (
-        SELECT
-            count(*) AS total,
-            sum(score) AS total_score,
-        FROM stories
-    )
-SELECT
-    max_score,
-    [min_score, max_score] as score_interval,
-    submissions,
-    submissions / totals.total as subm_fraction,
-    (SELECT COUNT(*) FROM stories where score <= max_score) / totals.total as cumulative_subm_fraction,
-    total_votes,
-    total_votes / totals.total_score as votes_fraction,
-FROM
-    intervals,
-    totals
-ORDER BY
-    min_score ASC
-```
 
 | score_interval   |   submissions |   subm_fraction |   cumulative_subm_fraction |   total_votes |   votes_fraction |
 |:-----------------|--------------:|----------------:|---------------------------:|--------------:|-----------------:|
@@ -189,17 +112,6 @@ We observe that almost half of all submissions did not get any upvote at all (sc
 
 But are these submissions just spam and low-quality submissions? Let's have another look at the data and see if there are high quality URLs which have a submission without an upvote.
 
-```sql
-SELECT
-    title,
-    ARRAY_AGG(score order by time ASC) as scores_by_time,
-FROM `bigquery-public-data.hacker_news.full`
-WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score > 0
-GROUP BY url,title
-HAVING COUNT(*) >= 2 AND min(score) = 1
-ORDER BY max(score) DESC
-LIMIT 30
-```
 
 | title                                                                            | scores_by_time                            |
 |:---------------------------------------------------------------------------------|:------------------------------------------|
@@ -264,12 +176,15 @@ Let's imagine a front-page where all submissions have the **same quality** and w
 
 If many submissions compete for upvotes, the positive feedback loop creates a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
 
-Every user acts on their own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a distribution where higher ranks receive more views than lower ranks (see graphic below, it was created using the [HN API](https://github.com/HackerNews/API) and observing score changes on every rank. The code will be published in the future).
+Every user acts on their own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a distribution where higher ranks receive more views than lower ranks. The graphic was created using the [Hacker News API](https://github.com/HackerNews/API) and observing score changes over time for every rank.
+
+![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
 
 Let's imagine the just mentioned front-page in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank increases the upvote count of that specific submission and pushes it to the top of the list. Now, that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
+
 If we run a second experiment and the first vote randomly hits a different rank and submission, then that specific submission has a better chance to get more upvotes. After many votes the ranking stabilizes and the high ranking submissions stay at high ranks while the lower ranked ones stay at lower ranks, without any chance to reach a high rank again.
 
-Which submissions stabilize at high ranks depends on where the early votes land, which is completely random. This means that random submissions get high stable ranks even though they have the same quality.
+Which submissions stabilize at high ranks depends on where the early votes land, which is completely random (submissions all have the same quality). This means that random submissions get high stable ranks even though they have the same quality.
 
 With submissions **submitted at different points in time**, the age penalty kicks in and pulls stabilized random submissions back down. This allows other random rich submissions to exploit their feedback loop, get richer, and move up to higher ranks.
 
@@ -278,7 +193,7 @@ Now let's put everything back together and imagine submissions with **different 
 This means, that **despite differences in the quality of submissions, random submissions rise to the top of the front-page**. Therefore, the number of votes does not correlate with a submission's quality. This is a very strong claim. Additionally to the data shown before, we're working on confirming this claim with a simulated front-page and will write about it in the future.
 
 
-![Histogram of vote distribution on front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and decreasing. With a hard drop on rank 30 (page 2)](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/votehist.svg)
+
 
 
 # How can the Ranking Algorithm be Improved?
@@ -319,11 +234,12 @@ We want to verify with simulations, if our proposal indeed meets the goals of Ha
 
 Here are a few plots of our simplified simulations. In these simulations, all submissions are shown immediately on the frontpage and ranked by the formula. There is no new-page. Submissions have a predifined random quality between 0 and 1. Random agents look at the frontpage and vote on submissions based on their quality. The agents look more freqently at higher ranks.
 
-Original Hacker News Formula:
+### Original Hacker News formula
 ![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-upvote-quality-scatterplot.png)
 
 Every point is a submission that went through the frontpage simulation. The x-axis shows its predefined quality and the y-axis its upvotes. We can see that higher quality content has the chance to reach higher scores. There are no false positives (low quality content with high score), but there are many false negatives (high quality content with low score). Some outliers have very high scores.
 
+### Hacker News formula divided by views
 If we use our proposed formula which divides the scoreRank by views, we get the following:
 ![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-normalized-upvote-quality-scatterplot.png)
 
@@ -331,14 +247,16 @@ Now there are basically no false-negatives (high quality with low score) anymore
 
 Other interesting balancing feedback loop formulas we came up with are:
 
-Only downvotes:
+### Only downvotes
 ```
 rankingScore = -(downvotes+1) * age
 ```
 
 ![Scatter Plot Upvotes vs Quality](https://github.com/fdietze/notes/raw/master/improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
 
-Upvotes with views as downvotes:
+Only having downvotes is very interesting, because it's much harder to promote your own content.
+
+### Upvotes with views as downvotes
 ```
 rankingScore = (upvotes-views-1) * age
 ```
@@ -356,3 +274,110 @@ We already evaluated the effectiveness of this approach with oversimplified proo
 
 Thanks for reading. We appreciate any feedback and ideas. Please get in touch!
 
+# Appendix
+
+## BigQuery sql queries
+
+These queries can be run on the [Hacker News Dataset](https://console.cloud.google.com/marketplace/product/y-combinator/hacker-news) on BigQuery. You can fork our [Kaggle Notebook](https://www.kaggle.com/felixdietze/hacker-news-score-analysis) to start.
+
+### All scores of urls with multiple submissions
+```sql
+-- note: score = upvotes + 1
+SELECT
+    title,
+    ARRAY_AGG(score order by time ASC) as scores_by_time,
+    DATE_DIFF(DATE(TIMESTAMP_SECONDS(MAX(time))),DATE(TIMESTAMP_SECONDS(MIN(time))), DAY) as days,
+FROM `bigquery-public-data.hacker_news.full`
+WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score >= 3
+GROUP BY url,title
+HAVING COUNT(*) >= 4 AND days <= 30
+ORDER BY max(score) DESC
+LIMIT 30
+```
+
+### Scores of urls with multiple submissions at the same time of day
+
+```sql
+WITH
+    stories AS (
+        SELECT *
+        FROM `bigquery-public-data.hacker_news.full`
+        WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score > 0
+        ORDER BY time DESC
+    )
+SELECT
+    ARRAY_AGG(score ORDER BY time) scores,
+    ARRAY_AGG(EXTRACT(HOUR FROM timestamp) order by time ASC) time_of_day,
+    stddev(EXTRACT(HOUR FROM timestamp)+EXTRACT(MINUTE FROM timestamp)/60) time_of_day_stddev,
+    DATE_DIFF(DATE(TIMESTAMP_SECONDS(MAX(time))),DATE(TIMESTAMP_SECONDS(MIN(time))), DAY) as days,
+FROM stories
+GROUP BY url,title
+HAVING
+    COUNT(*) >= 3 AND COUNT(*) <= 10
+    AND max(score) > 50
+    AND days < 90
+    AND time_of_day_stddev <= 2.5
+
+ORDER BY count(score) DESC, time_of_day_stddev ASC
+LIMIT 20
+```
+
+Note: We understand that the standard deviation of time-of-day should ideally be calculated using a [circular mean](https://en.wikipedia.org/wiki/Circular_mean), but we wanted to keep it simple.
+
+### Distribution of upvote counts
+
+For example: How many submissions got between 3 and 4 upvotes?
+
+```sql
+WITH
+    stories AS (
+        SELECT *
+        FROM `bigquery-public-data.hacker_news.full`
+        WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score > 0
+    ),
+    intervals AS (    
+        SELECT
+            min(score) as min_score,
+            max(score) as max_score,
+            COUNT(*) as submissions,
+            SUM(score) as total_votes,
+        FROM
+            stories
+        GROUP BY
+            ceil(log(score)/log(2))
+    ),
+    totals AS (
+        SELECT
+            count(*) AS total,
+            sum(score) AS total_score,
+        FROM stories
+    )
+SELECT
+    max_score,
+    [min_score, max_score] as score_interval,
+    submissions,
+    submissions / totals.total as subm_fraction,
+    (SELECT COUNT(*) FROM stories where score <= max_score) / totals.total as cumulative_subm_fraction,
+    total_votes,
+    total_votes / totals.total_score as votes_fraction,
+FROM
+    intervals,
+    totals
+ORDER BY
+    min_score ASC
+```
+
+### High quality submissions without upvotes
+
+
+```sql
+SELECT
+    title,
+    ARRAY_AGG(score order by time ASC) as scores_by_time,
+FROM `bigquery-public-data.hacker_news.full`
+WHERE `type` = 'story' AND url != '' AND score IS NOT NULL AND score > 0
+GROUP BY url,title
+HAVING COUNT(*) >= 2 AND min(score) = 1
+ORDER BY max(score) DESC
+LIMIT 30
+```
