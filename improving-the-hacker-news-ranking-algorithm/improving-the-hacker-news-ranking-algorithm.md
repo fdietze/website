@@ -1,8 +1,3 @@
----
-layout: post
-title: Improving the Hacker News Ranking Algorithm
----
-
 # Improving the Hacker News Ranking Algorithm
 
 *Felix Dietze & Johannes Nakayama, 2021-08*
