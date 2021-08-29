@@ -1,10 +1,9 @@
-# Improving the Hacker News Ranking Algorithm
+---
+title: Improving the Hacker News Ranking Algorithm
+author: [felix_dietze, johannes_nakayama]
+---
 
-*Felix Dietze & Johannes Nakayama, 2021-08*
-
-<felix.dietze@rwth-aachen.de>, <nakayama@comm.rwth-aachen.de>
-
-In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws:
+In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws.
 
 1. If a submission lands on the front-page, the number of upvotes it receives does not correlate with its quality. Independent of submission time, weekday, or clickbait titles.
 2. There are false negatives. Some high quality submissions do not receive any upvotes because they are overlooked on the fast-moving new-page.

@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="116.69935mm"
-   height="60.641125mm"
-   viewBox="0 0 116.69935 60.641125"
+   width="126.69935mm"
+   height="70.641129mm"
+   viewBox="0 0 126.69935 70.641129"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
@@ -333,23 +333,26 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8702528"
-     inkscape:cx="216.76468"
-     inkscape:cy="123.64761"
+     inkscape:cx="338.23411"
+     inkscape:cy="171.21581"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:snap-center="true"
      inkscape:snap-object-midpoints="true"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
+     fit-margin-top="5"
+     fit-margin-left="5"
+     fit-margin-right="5"
+     fit-margin-bottom="5"
      inkscape:window-width="2560"
-     inkscape:window-height="1416"
+     inkscape:window-height="1440"
      inkscape:window-x="0"
-     inkscape:window-y="24"
-     inkscape:window-maximized="0" />
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     lock-margins="true"
+     inkscape:pagecheckerboard="true"
+     inkscape:snap-page="true" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -366,7 +369,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-47.148509,-54.38447)">
+     transform="translate(-42.148509,-49.38447)">
+    <rect
+       style="fill:#ffffff;stroke-width:0.564885;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke markers fill"
+       id="rect2021"
+       width="126.69935"
+       height="70.641129"
+       x="42.14851"
+       y="49.384472" />
     <ellipse
        style="fill:none;stroke:#000000;stroke-width:0.287999;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:stroke markers fill"
        id="path833"
@@ -480,7 +490,7 @@
          style="font-size:7.05556px;stroke-width:0.264583">+</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583;stroke:#000000;stroke-opacity:1;"
+       style="font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke:#000000;stroke-width:0.264583;stroke-opacity:1"
        x="81.791084"
        y="95.448959"
        id="text3161-6"><tspan
@@ -488,7 +498,7 @@
          id="tspan3159-0"
          x="81.791084"
          y="95.448959"
-         style="stroke-width:0.264583;stroke:#000000;stroke-opacity:1;">-</tspan></text>
+         style="stroke:#000000;stroke-width:0.264583;stroke-opacity:1">-</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:7.05556px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
@@ -512,13 +522,13 @@
          y="87.362465"
          style="font-size:7.05556px;stroke-width:0.264583">+</tspan></text>
     <path
-       style="fill:#dd1717;stroke:#dd1717;stroke-width:0.565;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2581-7);fill-opacity:1"
+       style="fill:#dd1717;fill-opacity:1;stroke:#dd1717;stroke-width:0.565;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2581-7)"
        d="m 112.36201,77.877381 -0.72934,14.146276"
        id="path913-0"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
-       style="font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583;stroke:#dd1717;stroke-opacity:1;fill:#dd1717;fill-opacity:1;"
+       style="font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#dd1717;fill-opacity:1;stroke:#dd1717;stroke-width:0.264583;stroke-opacity:1"
        x="113.16798"
        y="87.094139"
        id="text3161-6-2"><tspan
@@ -526,6 +536,6 @@
          id="tspan3159-0-3"
          x="113.16798"
          y="87.094139"
-         style="stroke-width:0.264583;stroke:#dd1717;stroke-opacity:1;fill:#dd1717;fill-opacity:1;">-</tspan></text>
+         style="fill:#dd1717;fill-opacity:1;stroke:#dd1717;stroke-width:0.264583;stroke-opacity:1">-</tspan></text>
   </g>
 </svg>
