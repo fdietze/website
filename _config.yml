@@ -28,7 +28,7 @@ twitter_username: felixdietze
 github_username:  fdietze
 
 # Build settings
-theme: monophase
+remote_theme: zivhub/monophase
 plugins:
   - jekyll-feed
 
