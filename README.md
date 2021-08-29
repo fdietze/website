@@ -1,3 +1,9 @@
-## Felix Dietze
 
-* 2021-08 [Improving the Hacker News Ranking Algorithm](improving-the-hacker-news-ranking-algorithm/improving-the-hacker-news-ranking-algorithm.md)
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">{{ post.title }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
