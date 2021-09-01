@@ -1,6 +1,6 @@
 ---
 title: Improving the Hacker News Ranking Algorithm
-author: [felix_dietze, johannes_nakayama]
+author: [Felix Dietze, Johannes Nakayama]
 ---
 
 In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws.
