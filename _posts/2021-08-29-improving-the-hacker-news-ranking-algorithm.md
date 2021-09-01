@@ -211,7 +211,7 @@ We're working on alternative solutions with the following goals in mind:
 
 There are many ways to do this. In our opinion, the following is the most promising one that can be implemented in Hacker News:
 
-To balance the feedback loop, we add negative feedback: **More views of a submission should lead to a lower rank**. It turns the positive feedback loop into a **balancing feedback loop** that converges on the right amount of votes.
+To balance the feedback loop, we add negative feedback: **More views of a submission should lead to a lower rank**. It turns the positive feedback loop into a **[balancing feedback loop](https://en.wikipedia.org/wiki/Negative_feedback)** that converges on the right amount of votes.
 
 This can be achieved by normalizing the current ranking formula with the number of views:
 
