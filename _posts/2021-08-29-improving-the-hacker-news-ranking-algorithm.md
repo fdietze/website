@@ -223,17 +223,23 @@ rankingScore = ------------------------------------------
 
 ![Balancing Positive Feedback loop. Like in in the previous diagram: three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank". Additionally to the previous diagram, there is an arrow with a minus-sign from "views" to "rank".](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/feedback-loop-balanced.svg)
 
-This would solve the upvote vs quality correlation problem on the front-page. But high quality submissions can still be overlooked on the new-page (false negatives).
+To understand why this works, imagine two submissions with the same number of upvotes and a different number of views. The article with more views probably has a lower quality than the one with fewer views, because more people have viewed it without giving an upvote. So the ratio of upvotes and views is a signal of quality.
+
+By adding `/ views` to the formula, it contains exactly this ratio. Sorting by this ratio moves high-quality content to higher ranks. And at higher ranks, submissions get more views and upvotes, so the ratio becomes more accurate and converges. This makes the ratio comparable and thus a good indicator of quality. Interestingly, higher ratios will also have more upvotes, because of the ranking. And that is exactly what we are after: The number of upvotes correlates with quality.
+
+This would solve the problem of correlation between upvote and quality on the front page. But high quality submissions can still be overlooked on the new page (false negatives).
 
 The purpose of the new-page is to act as an initial filter and separate good from bad quality submissions. To achieve this goal, the new-page should expose every submission to a certain amount of views, to estimate its eligibility for the front-page.
 
-To fulfill this purpose without false negatives, we propose to use the same front-page formula on the new-page. In this case the new-page would look almost the same as the front-page where high quality submissions are at the top. To unclutter the new-page and make room for new submissions, there could be an upvote threshold, above which submissions are shown on the front-page and below which submissions are shown on the new-page.
+To fulfill this purpose without false negatives, we propose to use the same front-page formula on the new-page. In this case the new-page would look almost the same as the front-page where high quality submissions are at the top. To unclutter the new-page and make room for new submissions, there could be an upvote threshold (= quality threshold), above which submissions are shown on the front-page and below which submissions are shown on the new-page.
 
 ## Early Simulations
 
 We want to verify with simulations, if our proposal indeed meets the goals of Hacker News. In addition to that, we want to try other algorithms and see how those compare. Simplified proof of concept simulations already confirm that it's working as described.
 
-Here are a few plots of our early, simplified simulations. In these simulations, all submissions are shown immediately on the frontpage and ranked by the formula. There is no new-page. Submissions have a predifined random quality between 0 and 1. Random agents look at the frontpage and vote on submissions based on their quality. The agents look more freqently at higher ranks.
+Here are a few plots of our early, simplified simulations. In these simulations, all submissions are shown immediately on the frontpage and ranked by the formula. There is no new-page. Submissions have a predifined uniform random quality between 0 and 1. Random agents with an expectation threshold look at the frontpage and vote on submissions based on their quality. The agents look more freqently at higher ranks.
+
+Please keep in mind that these simulations have simplified assumptions that do not correspond to reality. For example, the quality distribution is uniform and the vote distribution does not follow that of the real front page. The plots are there to show that our ideas can work. And we are currently working on creating better simulations.
 
 ### Original Hacker News formula
 ![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-120). The points roughly describe a filled triangle from (0 quality,0 upvotes) over (1 quality, 0 upvotes) to about (1 quality, 40 upvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-upvote-quality-scatterplot.png)
@@ -245,26 +251,6 @@ If we use our proposed formula which divides the scoreRank by views, we get the 
 ![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-35). The points roughly describe a thick fuzzy line from (0 quality,0 upvotes) to about (1 quality, 15 upvotes). There are almost no points in the area below the line (high quality, few upvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-normalized-upvote-quality-scatterplot.png)
 
 Now there are basically no false-negatives (high quality with low score) anymore and the upvotes correlate much better with quality.
-
-Other interesting balancing feedback loop formulas we came up with are:
-
-### Only downvotes
-```
-rankingScore = -(downvotes+1) * age
-```
-
-![Scatterplot with quality on x-axis (0-1) and downvotes on y-axis (-18 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 downvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
-
-Only having downvotes has very interesting properties. It's much harder to promote your own content. Also, uncertainty (few votes) gets more attention (higher rank) instead of less, like it does for upvote based systems. 
-
-### Upvotes with views as downvotes
-```
-rankingScore = (upvotes-views-1) * age
-```
-
-![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (-16 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 upvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes). The shape looks very similar to the one with only downvotes.](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
-
-Interestingly, this formula seems to behave very similar to the downvote-only formula. Even though the users still have an upvote button.
 
 # Conclusion and Future Work
 
@@ -384,3 +370,26 @@ HAVING COUNT(*) >= 2 AND min(score) = 1
 ORDER BY max(score) DESC
 LIMIT 30
 ```
+
+## Alternative formulas
+
+We also experimented with other balancing feedback loop formulas, that have interesting properties:
+
+### Only downvotes
+```
+rankingScore = -(downvotes+1) * age
+```
+
+![Scatterplot with quality on x-axis (0-1) and downvotes on y-axis (-18 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 downvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
+
+Only having downvotes has very interesting properties. It's much harder to promote your own content. Also, uncertainty (few votes) gets more attention (higher rank) instead of less, like it does for upvote based systems. 
+
+### Upvotes with views as downvotes
+```
+rankingScore = (upvotes-views-1) * age
+```
+
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (-16 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 upvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes). The shape looks very similar to the one with only downvotes.](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
+
+Interestingly, this formula seems to behave very similar to the downvote-only formula. Even though the users still have an upvote button.
+
