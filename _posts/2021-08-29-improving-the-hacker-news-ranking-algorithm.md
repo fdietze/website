@@ -1,7 +1,10 @@
 ---
 title: Improving the Hacker News Ranking Algorithm
+excerpt: In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws.
 author: [Felix Dietze, Johannes Nakayama]
 ---
+
+*Update: [Comments on Hacker News](https://news.ycombinator.com/item?id=28391659)*
 
 In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws.
 
