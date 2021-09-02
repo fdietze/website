@@ -1,5 +1,12 @@
-# Quality assurance for collaborative artifact creation
-Goal: Manupulation resistant quality assurance for open and distributed communities that collaboratively work on a distributed artifact.
+---
+title: Quality Assurance for Collaborative Artifact Creation
+author: [Felix Dietze]
+---
+
+
+How can we create a manupulation resistant quality assurance algorithm for open and distributed communities that collaboratively work on a distributed artifact?
+
+Here is a draft with my current ideas.
 
 ## Distributed communities, same type of artifact
 There are multiple "communities" which collaborate on the same type of artifact. It can be imagined similarly to multiple forks of the same git repository, where every fork has a different group of maintainers. The contents of the individual repositories can diverge, but are compatible in the sense that they work on the same data structure with the same possible change actions and share the same "root commit".
@@ -39,7 +46,14 @@ The change approval threshold can depend on different metrics. Example: The crea
 ## AI, bots and Guilds
 Accounts are usually controlled by humans, but other scenarios are possible. Since the protocol is designed to be attack proof, there is no problem for AIs, bots and guilds to propose changes in the same way as everybody else does. They just need to play by the same reputation rules.
 
-## Change flooding attacks and rate limiting
+## Problems
 When there is no limit on creating new accounts, communities can be flooded with useless changes that drown legitimate change proposals of new users.
+
 Possible Mitigations:
 - Rate limiting zero-reputation change proposals using cryptographic puzzles like for creating new blocks in a blockchain
+
+When users built a certain amount of reputation, they have the power to vote. But if they never submit anything again, they retain that power and can use it to promote bad changes.
+
+Possible Mitigations:
+- Make voting cost a little reputation
+- Reputation decay

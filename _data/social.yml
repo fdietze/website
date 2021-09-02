@@ -1,0 +1,9 @@
+- title: Email
+  url: mailto:mail@felx.me
+  icon: fas fa-envelope
+- title: Twitter
+  url: https://twitter.com/felixdietze
+  icon: fab fa-twitter
+- title: GitHub
+  url: https://github.com/fdietze
+  icon: fab fa-github

@@ -261,7 +261,7 @@ We proposed a small modification to the Hacker News ranking formula, which turns
 We already evaluated the effectiveness of this approach with oversimplified proof-of-concept simulations. And the results are quite promising. But there's more work to do. Currently, we're working on a more realistic simulation with the goal to behave the same as Hacker News in reality - including a new-page. If we're accurate enough, we can evaluate how different formulas change the resulting front-page. But more on that in the future.
 
 
-Thanks for reading. We appreciate any feedback and ideas. Please get in touch!
+Thanks for reading. We appreciate any feedback and ideas. We're also looking for ways to fund our research. Please get in touch!
 
 # Appendix
 
