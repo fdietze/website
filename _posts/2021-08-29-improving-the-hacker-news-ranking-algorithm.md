@@ -174,7 +174,7 @@ Now let's imagine a front-page where all submissions have **exactly the same qua
 
 ![Positive Feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank".](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
 
-
+We define a view as a click by a registered user on a submission, so the user sees the submitted content. For [Ask HN](https://news.ycombinator.com/ask), the content would be the comments page. We only look at registered users, because these views are the only ones that can lead to more upvotes.
 
 If many submissions compete for upvotes, the positive feedback loop creates a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
 
