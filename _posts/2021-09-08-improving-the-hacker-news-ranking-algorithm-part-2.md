@@ -8,10 +8,11 @@ draft: true
 
 <!--
 TODO:
-* alt-texts überarbeiten
-* Grafiken mit neuen Daten plotten
 * Excerpt
 * Publishing date in file name
+* alt-texts überarbeiten
+* front-page/ newpage konsistent schreiben
+* Formeln -> alt texte?
 //-->
 
 *We tried to make this article as accessible as possible. If you find any accessibility issues with this article, please let us know: <mailto:mail@felx.me>*
@@ -31,8 +32,8 @@ We explained the underlying rich-get-richer dynamic by pointing out the followin
 
 ![Positive feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to "views". A fourth bubble "age" pointing with a minus-sign at "rank".](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/feedback-loop-v0.png)
 
-[NOTIZ: musste langsamer vorgelesen werden, damit es gut verstanden wurde]
-[NOTIZ: ankündigen, wenn Grafik beschrieben wird, da Leser (also Hörer) dann in den "Vorstellungsmodus" wechseln kann]
+<!-- [NOTIZ: musste langsamer vorgelesen werden, damit es gut verstanden wurde] -->
+<!-- [NOTIZ: ankündigen, wenn Grafik beschrieben wird, da Leser (also Hörer) dann in den "Vorstellungsmodus" wechseln kann] -->
 
 More exposure of a story leads to more views, which in turn leads to more upvotes, which leads to a higher rank on the frontpage, which in turn leads to even more views.
 
@@ -48,7 +49,7 @@ We submitted the article on Hacker News and received very helpful feedback.
 
 Here we'll address a few comments from the Hacker News comment thread:
 
-### *Click-Throughs and False Positives*
+### Click-Throughs and False Positives
 
 > [Original comment](https://news.ycombinator.com/item?id=28404169):
 >
@@ -60,7 +61,7 @@ The problem with using click-throughs in the way we proposed though, is that it 
 Ironically, we might in fact have proposed a ranking formula that systematically produces **false positives** (high ranked low-quality content).
 
 
-### *Click-Throughs Need User Tracking*
+### Click-Throughs Need User Tracking
 
 Apart from not penalizing obvious low-quality submissions, users pointed out that the needed click-through data might not be available:
 
@@ -77,7 +78,7 @@ This feedback made it more obvious that our simplified simulations had to make s
 Nonetheless, we still think that a low ratio between upvotes and received user attention is a good signal for quality.
 Click-through is just not the right metric to measure user attention.
 
-### *Sorting by ratio*
+### Sorting by ratio
 
 > [Original Comment](https://news.ycombinator.com/item?id=28403433):
 >
@@ -97,7 +98,7 @@ At this point though, it is too early for us to address this problem.
 We would like to figure out a good balancing feedback mechanism first and then apply these methods.
 
 
-### *Definition of quality*
+### Definition of quality
 
 > [Original Comment](https://news.ycombinator.com/item?id=28402171):
 >
@@ -111,7 +112,7 @@ Note that this is not an objective measure of quality but a subjective one that 
 > We look for submissions that we find valuable for us, ...
 
 
-### *Different voting weight on different ranks*
+### Different voting weight on different ranks
 
 > [Original Comment](https://news.ycombinator.com/item?id=28403483):
 >
@@ -122,7 +123,7 @@ Implicitly, this was already part of our initial approach, as we assumed that th
 But making the influence of different ranks explicit is a very good idea.
 
 
-### *Upvote penalty in the original Hacker News Formula*
+### Upvote penalty in the original Hacker News Formula
 
 We also noticed that we didn't consider an intricacy of the original Hacker News formula in our initial argument:
 `upvotes` has a `0.8` exponent.
@@ -132,7 +133,6 @@ $$
 \text{rankingScore} = \frac{\text{upvotes}^{0.8}}{(\text{ageHours} + 2)^{1.8}}
 $$
 
-[NOTIZ: Formeln -> alt texte?]
 
 Since $$\text{x}^{0.8}$$ grows slower than a linear function $$\text{x}$$, it acts as a limitation for too much user attention: The more upvotes a story already has, the less additional upvotes count for the score. 
 It can also be seen as a negative feedback for high upvote counts.
@@ -140,7 +140,7 @@ It can also be seen as a negative feedback for high upvote counts.
 This negative attention feedback via upvotes is no longer necessary for our approach. It is already provided by `clickThroughs`. So we can remove the `0.8` exponent in our new formula.
 
 
-### *Revised Goals*
+### Revised Goals
 
 Inspired from the feedback, we updated our goals as follows (added points are marked as <span style="color: limegreen">**bold green**</span>):
 
@@ -181,7 +181,7 @@ We already know that stories on higher ranks get more attention because we know 
 
 
 
-### *Key Insight: Deriving Attention Metric from Vote Distribution*
+### Key Insight: Deriving Attention Metric from Vote Distribution
 
 Since the distribution is calculated from many stories of **different quality**, we presume that attention follows roughly the same distribution.
 
@@ -201,7 +201,7 @@ TODO:
 
 
 
-### *How to calculate expected upvotes*
+### How to calculate expected upvotes
 
 
 
@@ -241,7 +241,7 @@ This simple change has several advantages compared to our previous approach, whi
 - Using expected upvotes does not require any additional user-tracking, it can be calculated from historical voting data
 
 
-### *Constructing a new ranking algorithm*
+### Constructing a new ranking algorithm
 
 Compared to our previous formula, we remove the `0.8` exponent on `upvotes` and replace `clickThroughs` by `cumulativeExpectedUpvotes`. A new formula could look like this:
 
@@ -324,16 +324,12 @@ We will discuss this below.
 
 ## Discussion
 
-- [ ] The higher the age, the more accurate the quality estimation.
-- [ ] threshold between new and frontpage
-
-
 We addressed many shortcomings of our previous approach, but we still consider it a work in progress.
 In this section, we aim to scrutinize our approach as thoroughly as possible and discuss some open questions.
 
 If you find flaws in our proposal that we overlooked and didn't mention in this section, please let us know!
 
-### *Expected Upvotes Depends on Time of Day and Day of Week*
+### Expected Upvotes Depends on Time of Day and Day of Week
 
 First of all, we brushed over how to compute `expected_upvotes` a little.
 We touched on the possibility that these might be computed from historical data, but there are many non-trivial things to consider.
@@ -350,81 +346,50 @@ For example, we could use data points from the previous month that were sampled 
 This way, we would take the effect of timing into account.
 Nonetheless, we want to explore the severity of this problem in simulations in the future.
 
-### *Changes in Activity Patterns over Time*
+### Changes in Activity Patterns over Time
 
 The periodicity of the activity on the site suggests that a large portion of the user base is located in a similar time zone. Another observation was that the number of total upvotes on hacker news seems quite stable in the recent years.
 However, the user base can change.
 Maybe in the future, large numbers of users from other parts of the world start to use the site or the community is growing or shrinking.
 Such changes would bias the `rankingScore`. But we believe that these changes happen slowly enough to not cause any problems, when the calculation of `expected_upvotes` uses recent historical data.
 
-### *How do we Calculate Expected Upvotes for very Low Ranks?*
+### How do we Calculate Expected Upvotes for very Low Ranks?
 
 As we calculate expected upvotes for all 1500 newest stories, we need to calculate them for every rank between 1 and 1500.
 But the very low ranks have don not accumulate enough upvotes to estimate expected upvotes.
 So some extrapolation is necessary.
 
-### 
-
-There is still the problem that we are sorting ratios that contain different amounts of information.
-This distorts the calc
-
-
-### *Cumulative Expected Votes Only Works because we Use the Arithmetic Mean*
+### Cumulative Expected Votes Only Works because we Use the Arithmetic Mean
 
 In our approach described above, we collect information by simply adding it to the expected vote count (cumulation).
 But this has the implicit assumption that the arithmetic mean is a good estimator for expected votes.
-It would be more precise to sample a ratio of upvotes / expected_upvotes at a specified time unit.
+It would be more precise to sample a ratio of `upvotes / expected_upvotes` at a specified time unit.
 So why don't we do that?
-Sampling at a very high rate (15 seconds in our proposal), a large portion of the samples would be 0 / expected_upvotes = 0.
-On the other hand, there would be rare samples of 1 / expected_upvotes or 2 / expected_upvotes >> 0 which would then correct the score upwards.
+Sampling at a very high rate (15 seconds in our proposal), a large portion of the samples would be `0 / expected_upvotes = 0`.
+On the other hand, there would be rare samples of `1 / expected_upvotes` or `2 / expected_upvotes >> 0` which would then correct the score upwards.
+
+### Threshold between New and Front page
+
+We proposed to use our algorithm for the front- and the new-page. Where both pages are mutually exclusive. Therefore we need to decide a condition where a specific story should be shown. The current Hacker News site has a threshold of `3` upvotes as a necessary criterium for a story to be shown on the frontpage. This is an arbitrary decision to control the quality level of the fontpage. With our threshold we need to do the same thing. But it's up for debate what a sensible threshold should be. We need to figure this out with real-life experiments in the future.
 
 
 
 
-- [ ] sorting by avg rating (Counter initial oscillations)
+
+<!-- * impressions as time: age has time fluctuation problems. They could be solved by using impressions as age proxy. but this would change the bevaior of hacker news. And hard to calculate. If behind a cache, the daytime fluctuations would not be apparent -->
+
+## Conclusion and Future Work
+
+<!-- TODO: Conclusion //-->
 
 
-* impressions as time: age has time fluctuation problems. They could be solved by using impressions as age proxy. but this would change the bevaior of hacker news. And hard to calculate. If behind a cache, the daytime fluctuations would not be apparent
 
+Thanks for reading. We appreciate any feedback and ideas. We're also looking for ways to fund our research. Please get in touch!
 
-## Conclusion
-
-# Noch zu verbauen
-
-*Old stuff from proposal (to be potentially harvested)*
-
+Special thanks to
+Jonathan Warden, proof readers,  Canonical Debate Lab
 <!--
-* impression / vote ratio is only comparable across ranks if impressions and votes follow the same distribution (detailed explanation) (thought experiment: all posts have the same quality, therefore they should get the same ratio, but more votes come in at higher ranks, so something needs to be scaled)
-* updated proposal with new formula, implementation details how to collect cumulative impression data, sum of votes / sum of impressions
+TODO: links to their websites
+- https://deliberati.gitlab.io/
+- https://canonicaldebatelab.com/
 //-->
-
-<!--
-
-If we use attention as a negative feedback, we need to find a metric, that is possible to compute without additional user tracking.
-
-We propose cumulative expected votes over a stories rank history as a suitable metric. We already know from historical data how votes are distributed across ranks.
-
-We need to show that the vote distribution is independent of quality. This can be done by plotting different rank distributions for clusters of stories with different quality.
-
-Independent of quality, every story is shown at different ranks over time.
-
-Since the vote distribution is stable independent of story quality, we can use it as a proxy for total attention a story has received.
-
-Since the initial upvote count for a submitted story is `1` (original posters vote), we'll do the same for the impression count. This avoids division by `0` errors.
-
-//-->
-
-----
-
-
-
-
-
-# Further text blocks
-
-- assumption that we know the vote distribution over ranks
-  -
-
-Credits / Thanks
-
-Jonathan
