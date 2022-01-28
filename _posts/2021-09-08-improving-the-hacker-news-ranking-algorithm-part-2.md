@@ -1,6 +1,6 @@
 ---
 title: Improving the Hacker News Ranking Algorithm - Part 2
-excerpt: In a recent post, we provided a visualization for the positive feedback loop that is inherent in the current Hacker News ranking formula. We went on to propose a formula that in our view alleviated this feedback loop and the problems that came with it. In this post, we present the feedback that we got from the Hacker News community, most notably a critical flaw in our initial thinking.
+excerpt: In this follow-up to our first proposal to improve the Hacker News ranking formula, we address the feedback that we received from the Hacker News community. Our new approach estimates quality as the ratio of upvotes to expected upvotes. We include a possible implementation of an algorithm that implements the method that we developed.
 math: true
 author: [Felix Dietze, Johannes Nakayama]
 draft: true
@@ -331,8 +331,7 @@ If you find flaws in our proposal that we overlooked and didn't mention in this 
 
 ### Expected Upvotes Depends on Time of Day and Day of Week
 
-First of all, we brushed over how to compute `expected_upvotes` a little.
-We touched on the possibility that these might be computed from historical data, but there are many non-trivial things to consider.
+We touched on the possibility that `expected_upvotes` might be computed from historical data, but there are many non-trivial things to consider.
 Most importantly, we have to address the issue posed by variation in the vote arrival rates due to time of day and day of the week.
 In the data we collected, we can clearly observe patterns that arise with regard to these time factors.
 
@@ -370,7 +369,7 @@ On the other hand, there would be rare samples of `1 / expected_upvotes` or `2 /
 
 ### Threshold between New and Front page
 
-We proposed to use our algorithm for the front- and the new-page. Where both pages are mutually exclusive. Therefore we need to decide a condition where a specific story should be shown. The current Hacker News site has a threshold of `3` upvotes as a necessary criterium for a story to be shown on the frontpage. This is an arbitrary decision to control the quality level of the fontpage. With our threshold we need to do the same thing. But it's up for debate what a sensible threshold should be. We need to figure this out with real-life experiments in the future.
+We proposed to use our algorithm for the front- and the new-page. Where both pages are mutually exclusive. Therefore we need to decide a condition where a specific story should be shown. The current Hacker News site has a threshold of `3` upvotes as a necessary criterium for a story to be shown on the frontpage. This is an arbitrary decision to control the quality level of the frontpage. With our threshold we need to do the same thing. But it's up for debate what a sensible threshold should be. We need to figure this out with real-life experiments in the future.
 
 
 
@@ -380,7 +379,33 @@ We proposed to use our algorithm for the front- and the new-page. Where both pag
 
 ## Conclusion and Future Work
 
-<!-- TODO: Conclusion //-->
+<!--
+TODO:
+* [ ] does this part summarize the relevant parts of the proposal and the future work?
+//-->
+
+Once again, we would like to thank everyone that has provided us with valuable feedback, on Hacker News as well as in our feedback cycles.
+In this post, we addressed the most important feedbacks that we received for our previous proposal on how to improve the Hacker News ranking formula.
+Most importantly, we abandoned click-through as a metric for user attention and moved to a formula that estimates **quality as the ratio of upvotes to expected upvotes**.
+We also identified several factors that need to be taken into account when estimating expected upvotes.
+
+Still, there are many open questions.
+For once, we layed out that we cannot just sort by the ratio we proposed because this would fail to take into account that not all ratios contain the same amount of information.
+A story that has just been posted might get a few upvotes very early on purely by chance.
+The next step for us is going to be to figure out, how uncertainty about the ratio could factor into the ranking.
+
+Furthermore, while we sketched out how expected upvotes might be estimated, we still need to develop an actual model for this metric.
+From the data we collected so far, it seems like a pretty straight forward Poisson model might be sufficient, but we have to verify this by putting it to a test.
+For this purpose, we will do simulations and see whether the proposed formula and algorithm are feasible.
+
+<!--
+TODO:
+* [ ] create github organization where people can follow our work
+* [ ] include link and reference to it here
+//-->
+
+
+---
 
 
 
@@ -390,6 +415,7 @@ Special thanks to
 Jonathan Warden, proof readers,  Canonical Debate Lab
 <!--
 TODO: links to their websites
-- https://deliberati.gitlab.io/
-- https://canonicaldebatelab.com/
+https://deliberati.gitlab.io/
+https://canonicaldebatelab.com/
 //-->
+
