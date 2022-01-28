@@ -1,6 +1,6 @@
 ---
 title: Improving the Hacker News Ranking Algorithm - Part 2
-excerpt: In this follow-up to our first proposal to improve the Hacker News ranking formula, we address the feedback that we received from the Hacker News community. Our new approach estimates quality as the ratio of upvotes to expected upvotes. We include a possible implementation of an algorithm that implements the method that we developed.
+excerpt: In this follow-up to our first proposal to improve the Hacker News ranking formula, we address the feedback that we received from the Hacker News community. Our new approach estimates quality as the ratio of upvotes to expected upvotes. We include an algorithm of the method that we developed.
 math: true
 author: [Felix Dietze, Johannes Nakayama]
 draft: true
@@ -8,7 +8,6 @@ draft: true
 
 <!--
 TODO:
-* Excerpt
 * Publishing date in file name
 * alt-texts überarbeiten
 * front-page/ newpage konsistent schreiben
@@ -379,24 +378,26 @@ We proposed to use our algorithm for the front- and the new-page. Where both pag
 
 ## Conclusion and Future Work
 
-<!--
-TODO:
-* [ ] does this part summarize the relevant parts of the proposal and the future work?
-//-->
-
-Once again, we would like to thank everyone that has provided us with valuable feedback, on Hacker News as well as in our feedback cycles.
-In this post, we addressed the most important feedbacks that we received for our previous proposal on how to improve the Hacker News ranking formula.
-Most importantly, we abandoned click-through as a metric for user attention and moved to a formula that estimates **quality as the ratio of upvotes to expected upvotes**.
+In this post, we addressed the most important feedback that we received for our previous proposal on how to improve the Hacker News ranking formula.
+Most importantly, we abandoned click-through as a metric for user attention.
+Instead, we measure attention with expected upvotes and move to a formula that estimates **quality as the ratio of upvotes to expected upvotes**.
 We also identified several factors that need to be taken into account when estimating expected upvotes.
 
 Still, there are many open questions.
-For once, we layed out that we cannot just sort by the ratio we proposed because this would fail to take into account that not all ratios contain the same amount of information.
+For once, we layed out that sorting by ratio might have issues. 
+It doesn't take into account that not all ratios contain the same amount of information.
 A story that has just been posted might get a few upvotes very early on purely by chance.
 The next step for us is going to be to figure out, how uncertainty about the ratio could factor into the ranking.
 
 Furthermore, while we sketched out how expected upvotes might be estimated, we still need to develop an actual model for this metric.
 From the data we collected so far, it seems like a pretty straight forward Poisson model might be sufficient, but we have to verify this by putting it to a test.
 For this purpose, we will do simulations and see whether the proposed formula and algorithm are feasible.
+
+
+
+Once again, we would like to thank everyone who has provided us with valuable feedback, on Hacker News as well as in our feedback cycles.
+
+
 
 <!--
 TODO:
