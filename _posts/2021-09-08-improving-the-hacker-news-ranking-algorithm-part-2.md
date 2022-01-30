@@ -169,7 +169,9 @@ But as we learned from the community, using `clickThroughs` is not sufficient, b
 That's why we'll look into another way to measure user attention.
 
 
+<!--
 Todo: wir machen kein richtiges assessment, also den Satz am besten weglassen
+//-->
 
 To find a suitable metric, let's first assess which data about user attention we actually have.
 From using the Hacker News API, we know that we can infer voting information of individual stories and we presume that HN probably only tracks pageviews.
@@ -193,8 +195,10 @@ We call this `expected_upvotes`.
 With this metric, we can compare how a story performed vs. how it should have performed on average.
 We can view `expected_upvotes` as negative feedback.
 
+<!--
 TODO: 
 * Sichtweisen auseinandernehmen: ratio vs. negative feedback
+//-->
 
 ![Updated balanced feedback loop. The diagram shows three bubbles: "rank", "age", and "upvotes". The bubbles are connected with arrows with plus or minus signs. "rank" and "upvotes" point at each other with plus arrows. "age" points at "rank" with a minus arrow. Additionally to these three bubbles, there is a fourth bubble "expected_upvotes". "rank" points at "expected_upvotes" with a plus arrow, and "expected_upvotes" points back to "rank" with a minus arrow.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/feedback-loop-balanced.png)
 
@@ -211,10 +215,12 @@ And the expected value of a [Poisson distribution](http://wikipedia.org) equals 
 This way we can calculate how many upvotes a story on a specific rank can expect.
 With enough data, we can even calculate the expected upvotes for a specific rank at a specific time of day on a specific weekday.
 
+<!--
 TODO:
 * graphic of Poisson process for one rank
     * upvotes per minute [probably not a good idea]
     * Make caption more understandable
+//-->
 
 ![Histograms of the upvote arrivals per hour for the first 10 ranks of the front page. The distribution is very flat for rank 1, the distributions for lower ranks become increasingly pointy. All the histograms resemble the Poisson distribution. Additionally to the distributions, the mean upvote arrival is indicated in each plot by a vertical line. The mean for rank 1 is very high, the means for subseqent ranks drop off sharply and then flatten out.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/vote-arrivals-per-rank.png)
 
@@ -224,9 +230,6 @@ And on every rank it is expected to collect a certain amount of upvotes.
 Summing up all these expectations over the lifetime of the story, we get a picture of how many upvotes the story was expected to receive and how many upvotes it actually received.
 Stories of higher quality will naturally over-perform and low quality stories will under-perform.
 
-TODO: plot bars of how many votes came in every 15min vs expected upvotes per min
-
-TODO: Make the number "1" be visible on the rank scale
 
 ![The ranking history of a specific story within the first 24 hours after it is posted. The story starts at around rank 15, then quickly rises to rank 1 and stays there for a while. After a while, the story climbs down on the front page and reaches rank 90 after around 24 hours.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/story-rank-history.png)
 
@@ -412,8 +415,10 @@ TODO:
 
 Thanks for reading. We appreciate any feedback and ideas. We're also looking for ways to fund our research. Please get in touch!
 
+<!--
 Special thanks to
 Jonathan Warden, proof readers,  Canonical Debate Lab
+//-->
 <!--
 TODO: links to their websites
 https://deliberati.gitlab.io/
