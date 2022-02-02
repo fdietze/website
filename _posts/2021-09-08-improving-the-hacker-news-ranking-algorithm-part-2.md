@@ -12,6 +12,8 @@ TODO:
 * alt-texts überarbeiten
 * front-page/ newpage konsistent schreiben
 * Formeln -> alt texte?
+* Link first article to part 2
+* Mention 5 months of research time?
 //-->
 
 *We tried to make this article as accessible as possible. If you find any accessibility issues with this article, please let us know: <mailto:mail@felx.me>*
