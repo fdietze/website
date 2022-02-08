@@ -19,6 +19,45 @@ TODO:
 *We tried to make this article as accessible as possible. If you find any accessibility issues with this article, please let us know: <mailto:mail@felx.me>*
 
 ----
+Hacker News is a community with a [general guideline](https://news.ycombinator.com/newsguidelines.html) to post "anything that gratifies one's intellectual curiosity".
+Content is curated by a news aggregator with a global frontpage.
+This has the effect that high-ranking content receives more attention.
+
+As we understand it, the goal of the ranking algorithm is thus to distribute attention to submissions, such that submissions with higher quality receive more attention. We define quality of a submission as the fraction of all users, that, if exposed to the story, would upvote it. This means that quality is not an objective criterion, but collectively defined by the judgement of all community members.
+
+
+
+<!--
+TODO: rewrite introduction & conclusion
+Users cast their judgement through upvoting submissions.
+The current formula uses this aggregate judgement as follows:
+
+[FORMULA]
+
+short explanation of ranking formula (with link to longer explanation)
+
+
+problems with the current formula regarding the goals
+
+why + link to explanation
+
+
+proposes solution from last time + feedback
+
+//-->
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 In our [previous article](/2021/08/29/improving-the-hacker-news-ranking-algorithm.html), we described two problems of the current Hacker News ranking algorithm.
 
@@ -26,15 +65,11 @@ In our [previous article](/2021/08/29/improving-the-hacker-news-ranking-algorith
 2. High quality content gets overlooked.
 
 
-We define `quality` as the fraction of users who **would** upvote a story, independent of their motive.
-
 
 We explained the underlying rich-get-richer dynamic by pointing out the following positive feedback loop:
 
 ![Positive feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to "views". A fourth bubble "age" pointing with a minus-sign at "rank".](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/feedback-loop-v0.png)
 
-<!-- [NOTIZ: musste langsamer vorgelesen werden, damit es gut verstanden wurde] -->
-<!-- [NOTIZ: ankündigen, wenn Grafik beschrieben wird, da Leser (also Hörer) dann in den "Vorstellungsmodus" wechseln kann] -->
 
 More exposure of a story leads to more views, which in turn leads to more upvotes, which leads to a higher rank on the frontpage, which in turn leads to even more views.
 
