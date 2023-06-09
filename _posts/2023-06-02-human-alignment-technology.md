@@ -39,4 +39,4 @@ On this network, people often share their opinions. If you agree with an opinion
 # Conclusion
 The internet allows us to experiment with these kinds of rules. We can create entirely new systems of communication and alignment that can connect vast numbers of people. But as shown, the choice of rules has a big impact on the flow of information between all users. The rules essentially determine how people get aligned.
 
-In our open research group, ["Social Protocols"](https://social-protocols.org), our mission is to find rules for large-scale human interaction and alignment. If you are interested in contributing, please get in touch.
+In our open research group, [Social Protocols](https://social-protocols.org), our mission is to find rules for large-scale human interaction and alignment. If you are interested in contributing, please get in touch.
