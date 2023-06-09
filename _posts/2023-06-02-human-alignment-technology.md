@@ -8,9 +8,9 @@ draft: true
 
 ![AI generated image: A group of people sitting and collectively imagining a distant city made of colors and light.](/assets/2023-06-02-human-alignment-technology/collective.png)
 
+## Human Alignment
 Human alignment, the process of establishing shared understanding among individuals, is crucial for effective collaboration and organization. It is essential for civilizations to flourish.
 
-## Human Alignment
 Alignment establishes shared knowledge, values, and goals. It finds trade-offs and negotiates a shared truth. Shared goals allow people to work together toward those goals, rather than everyone pulling in different directions. People who rely on the same facts while accepting uncertainty can make the best decisions.
 Once aligned, a group of people can collectively act and reason as a unit, no matter how large. Imagine humanity acting and reasoning as a single unit to solve problems and shape its own future.
 
