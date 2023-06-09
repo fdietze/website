@@ -1,6 +1,6 @@
 ---
 title: Human Alignment Technology
-excerpt: Human alignment, the process of establishing shared understanding among individuals, is crucial for effective collaboration and organization. It is essential for making civilizations flourish.
+excerpt: Human alignment, the process of establishing shared understanding among individuals, is crucial for effective collaboration and organization. It is essential for civilizations to flourish.
 math: false
 author: [Felix Dietze]
 draft: true
@@ -14,7 +14,7 @@ Human alignment, the process of establishing shared understanding among individu
 Alignment establishes shared knowledge, values, and goals. It finds trade-offs and negotiates a shared truth. Shared goals allow people to work together toward those goals, rather than everyone pulling in different directions. People who rely on the same facts while accepting uncertainty can make the best decisions.
 Once aligned, a group of people can collectively act and reason as a unit, no matter how large. Imagine humanity acting and reasoning as a single unit to solve problems and shape its own future.
 
-Alignment doesn't mean that everyone knows exactly the same things and has the same opinions. It doesn't lead to everyone being interested in the same things, having the same hobbies, or getting the same haircuts. No single individual has the capacity to have all the knowledge; individuals can only know a part of the whole. Rather, it means that an individual's knowledge and opinions are compatible with those of others. They carry a common truth together, while diversity helps to expand it.
+Alignment does not mean that everyone knows the exact same things and has the exact same opinions. It doesn't lead to everyone being interested in the same subjects, having the same hobbies, or getting the same haircuts. No single individual has the capacity to have all the knowledge; individuals can only know a part of the whole. Rather, it means that an individual's knowledge and opinions are compatible with those of others. They carry a common truth together, while diversity helps to expand it.
 
 When alignment is not established, things get off track. Opinions and knowledge diverge and become incompatible. Without alignment around common goals, collaboration becomes difficult. Misalignment leads to confusion, poor decisions, and conflict. When those in power are misaligned with the rest of the population, entire civilizations fall apart.
 
