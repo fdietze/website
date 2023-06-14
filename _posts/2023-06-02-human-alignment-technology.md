@@ -3,7 +3,7 @@ title: Human Alignment Technology
 excerpt: Human alignment, the process of establishing shared understanding among individuals, is crucial for effective collaboration and organization. It is essential for civilizations to flourish.
 math: false
 author: [Felix Dietze]
-draft: true
+canonical_url: https://social-protocols.org/human-alignment-technology/
 ---
 
 ![AI generated image: A group of people sitting and collectively imagining a distant city made of colors and light.](/assets/2023-06-02-human-alignment-technology/collective.png)
