@@ -29,6 +29,9 @@ github_username:  fdietze
 author:
   name: Felix Dietze
 
+custom_head_code: |
+  <script data-goatcounter="https://felx.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
 # Build settings
 remote_theme: fdietze/monophase
 plugins:
