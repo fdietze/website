@@ -6,7 +6,7 @@ author: [Felix Dietze, Johannes Nakayama]
 
 *Update: [Comments on Hacker News](https://news.ycombinator.com/item?id=28391659)*
 
-*Update 2: With all the learnings after writing this post, we actually built something: [Quality News](https://news.social-protocols.org), [read about it here.] (https://github.com/social-protocols/news)*
+*Update 2: With all the learnings after writing this post, we built something: [Quality News](https://news.social-protocols.org), [read about it here.](https://github.com/social-protocols/news)*
 
 In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws.
 
