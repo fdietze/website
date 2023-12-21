@@ -19,9 +19,9 @@
 # in the templates via {{ site.myvariable }}.
 
 title: Felix Dietze's blog
-email: felix.dietze@rwth-aachen.de
+email: mail@felx.me
 description: >- # this means to ignore newlines until "baseurl:"
-  Thoughts by Felix Dietze
+  My Website
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://felx.me" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: felixdietze
