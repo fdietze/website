@@ -1,7 +1,0 @@
-{%- macro legacy_url(url) -%}
-  {{- url | replace(from=".html/", to=".html") -}}
-{%- endmacro legacy_url -%}
-
-{%- macro legacy_path(url, base_url) -%}
-  {{- url | replace(from=base_url, to="") | replace(from=".html/", to=".html") -}}
-{%- endmacro legacy_path -%}

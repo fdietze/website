@@ -1,4 +1,3 @@
-{% import "macros.html" as macros %}
 <!DOCTYPE html>
 <html lang="{{ lang | default(value=config.default_language) }}">
   <head>
@@ -12,7 +11,7 @@
     {% if page is defined %}
       {% set meta_title = page.title ~ " | " ~ config.title %}
       {% set meta_description = page.description | default(value=config.description) %}
-      {% set canonical_url = macros::legacy_url(url=page.extra.canonical_url | default(value=page.permalink)) %}
+      {% set canonical_url = page.extra.canonical_url | default(value=page.permalink) %}
     {% elif section is defined and section.path != "/" %}
       {% set meta_title = section.title ~ " | " ~ config.title %}
       {% set meta_description = section.description | default(value=config.description) %}

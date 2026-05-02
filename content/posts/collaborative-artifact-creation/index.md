@@ -2,7 +2,7 @@
 title = "Quality Assurance for Collaborative Artifact Creation"
 description = "How can we create a manupulation resistant quality assurance algorithm for open and distributed communities that collaboratively work on a distributed artifact?"
 date = 2021-02-20
-path = "2021/02/20/collaborative-artifact-creation.html"
+aliases = ["2021/02/20/collaborative-artifact-creation.html"]
 
 [extra]
 authors = ["Felix Dietze"]

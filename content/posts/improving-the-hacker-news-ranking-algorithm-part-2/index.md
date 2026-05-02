@@ -3,7 +3,7 @@ title = "Improving the Hacker News Ranking Algorithm - Part 2"
 description = "A follow-up on improving the Hacker News ranking formula that addresses community feedback and proposes estimating quality as the ratio of upvotes to expected upvotes."
 date = 2021-09-08
 draft = false
-path = "2021/09/08/improving-the-hacker-news-ranking-algorithm-part-2.html"
+aliases = ["2021/09/08/improving-the-hacker-news-ranking-algorithm-part-2.html"]
 
 [extra]
 authors = ["Felix Dietze", "Johannes Nakayama"]
@@ -73,14 +73,14 @@ In our [previous article](/2021/08/29/improving-the-hacker-news-ranking-algorith
 
 We explained the underlying rich-get-richer dynamic by pointing out the following positive feedback loop:
 
-![Positive feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to "views". A fourth bubble "age" pointing with a minus-sign at "rank".](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/feedback-loop-v0.png)
+![Positive feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to "views". A fourth bubble "age" pointing with a minus-sign at "rank".](feedback-loop-v0.png)
 
 
 More exposure of a story leads to more views, which in turn leads to more upvotes, which leads to a higher rank on the frontpage, which in turn leads to even more views.
 
 To alleviate this effect, we proposed that the positive feedback loop should be turned into a balanced feedback loop by introducing a view (click-through) penalty.
 
-![Balancing positive feedback loop. Like in in the previous diagram: Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank". Additionally to the previous diagram, there is an arrow with a minus-sign from "views" to "rank".](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/feedback-loop-balanced-v0.png)
+![Balancing positive feedback loop. Like in in the previous diagram: Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank". Additionally to the previous diagram, there is an arrow with a minus-sign from "views" to "rank".](feedback-loop-balanced-v0.png)
 
 Our thought process was, that a post receiving many views and comparatively few upvotes is a good signal for low quality.
 
@@ -220,7 +220,7 @@ From using the Hacker News API, we know that we can infer voting information of 
 
 We already know that stories on higher ranks get more attention because we know the distribution of average vote arrivals per rank.
 
-![Histogram of the average upvote arrivals per hour. The histogram bars draw a curve that resembles a Pareto distribution: It starts with a very high value for rank 1, then drops off sharply and flattens out towards lower ranks. Additionally, there is a noticeable drop-off between rank 30 and 31 where page 1 of the Hacker News frontpage ends and page 2 starts, giving the curve a "dent".](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/rank-vote-distribution.png)
+![Histogram of the average upvote arrivals per hour. The histogram bars draw a curve that resembles a Pareto distribution: It starts with a very high value for rank 1, then drops off sharply and flattens out towards lower ranks. Additionally, there is a noticeable drop-off between rank 30 and 31 where page 1 of the Hacker News frontpage ends and page 2 starts, giving the curve a "dent".](rank-vote-distribution.png)
 
 
 
@@ -242,7 +242,7 @@ TODO:
 * Sichtweisen auseinandernehmen: ratio vs. negative feedback
 //-->
 
-![Updated balanced feedback loop. The diagram shows three bubbles: "rank", "age", and "upvotes". The bubbles are connected with arrows with plus or minus signs. "rank" and "upvotes" point at each other with plus arrows. "age" points at "rank" with a minus arrow. Additionally to these three bubbles, there is a fourth bubble "expected_upvotes". "rank" points at "expected_upvotes" with a plus arrow, and "expected_upvotes" points back to "rank" with a minus arrow.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/feedback-loop-balanced.png)
+![Updated balanced feedback loop. The diagram shows three bubbles: "rank", "age", and "upvotes". The bubbles are connected with arrows with plus or minus signs. "rank" and "upvotes" point at each other with plus arrows. "age" points at "rank" with a minus arrow. Additionally to these three bubbles, there is a fourth bubble "expected_upvotes". "rank" points at "expected_upvotes" with a plus arrow, and "expected_upvotes" points back to "rank" with a minus arrow.](feedback-loop-balanced.png)
 
 
 
@@ -264,7 +264,7 @@ TODO:
     * Make caption more understandable
 //-->
 
-![Histograms of the upvote arrivals per hour for the first 10 ranks of the front page. The distribution is very flat for rank 1, the distributions for lower ranks become increasingly pointy. All the histograms resemble the Poisson distribution. Additionally to the distributions, the mean upvote arrival is indicated in each plot by a vertical line. The mean for rank 1 is very high, the means for subseqent ranks drop off sharply and then flatten out.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/vote-arrivals-per-rank.png)
+![Histograms of the upvote arrivals per hour for the first 10 ranks of the front page. The distribution is very flat for rank 1, the distributions for lower ranks become increasingly pointy. All the histograms resemble the Poisson distribution. Additionally to the distributions, the mean upvote arrival is indicated in each plot by a vertical line. The mean for rank 1 is very high, the means for subseqent ranks drop off sharply and then flatten out.](vote-arrivals-per-rank.png)
 
 
 Looking at the history of a single story over time, we can see that it was shown on a series of different ranks on the frontpage.
@@ -273,7 +273,7 @@ Summing up all these expectations over the lifetime of the story, we get a pictu
 Stories of higher quality will naturally over-perform and low quality stories will under-perform.
 
 
-![The ranking history of a specific story within the first 24 hours after it is posted. The story starts at around rank 15, then quickly rises to rank 1 and stays there for a while. After a while, the story climbs down on the front page and reaches rank 90 after around 24 hours.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/story-rank-history.png)
+![The ranking history of a specific story within the first 24 hours after it is posted. The story starts at around rank 15, then quickly rises to rank 1 and stays there for a while. After a while, the story climbs down on the front page and reaches rank 90 after around 24 hours.](story-rank-history.png)
 
 To summarize, our new idea is to use the cumulative expected votes per rank as a metric for user attention and use it as a negative feedback in the ranking formula.
 This simple change has several advantages compared to our previous approach, which used `clickThroughs` as a negative feedback:
@@ -380,7 +380,7 @@ Most importantly, we have to address the issue posed by variation in the vote ar
 In the data we collected, we can clearly observe patterns that arise with regard to these time factors.
 
 
-![Average upvote arrival rates per hour for each day of the week. The average upvote arrival rates are low in the morning and high in the afternoon of each day. The volume of vote arrivals is slightly lower on the weekend than on the weekdays.](/assets/2021-09-08-improving-the-hacker-news-ranking-algorithm-part-2/weekly-hourly-vote-arrivals.png)
+![Average upvote arrival rates per hour for each day of the week. The average upvote arrival rates are low in the morning and high in the afternoon of each day. The volume of vote arrivals is slightly lower on the weekend than on the weekdays.](weekly-hourly-vote-arrivals.png)
 
 If we simply computed `expected_upvotes` from the rank (thus averaging over all data points regardless of arrival time), we might systematically put stories that are posted on certain times at an advantage.
 

@@ -1,4 +1,3 @@
-{% import "macros.html" as macros %}
 {% set posts_section = get_section(path="posts/_index.md") %}
 {% set_global listed_pages = [] %}
 {% for page in posts_section.pages %}
@@ -22,16 +21,16 @@
   {% for page in listed_pages %}
     <entry>
       <title type="html">{{ page.title }}</title>
-      <link href="{{ macros::legacy_url(url=page.permalink) | safe }}" rel="alternate" type="text/html" title="{{ page.title }}" />
+      <link href="{{ page.permalink | safe }}" rel="alternate" type="text/html" title="{{ page.title }}" />
       <published>{{ page.date | date(format="%+") }}</published>
       <updated>{{ page.updated | default(value=page.date) | date(format="%+") }}</updated>
-      <id>{{ page.permalink | replace(from=".html", to="") | safe }}</id>
-      <content type="html" xml:base="{{ macros::legacy_url(url=page.permalink) | safe }}"><![CDATA[{{ page.content }}]]></content>
+      <id>{{ page.permalink | safe }}</id>
+      <content type="html" xml:base="{{ page.permalink | safe }}"><![CDATA[{{ page.content }}]]></content>
       {% if page.extra.authors %}
       <author><name>{{ page.extra.authors | join(sep=", ") }}</name></author>
       {% endif %}
       {% if page.description %}
-      <summary type="html">{{ page.description }}</summary>
+      <summary type="html"><![CDATA[{{ page.description }}]]></summary>
       {% endif %}
     </entry>
   {% endfor %}

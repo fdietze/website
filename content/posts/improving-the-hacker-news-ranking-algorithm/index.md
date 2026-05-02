@@ -2,7 +2,7 @@
 title = "Improving the Hacker News Ranking Algorithm"
 description = "In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws."
 date = 2021-08-29
-path = "2021/08/29/improving-the-hacker-news-ranking-algorithm.html"
+aliases = ["2021/08/29/improving-the-hacker-news-ranking-algorithm.html"]
 
 [extra]
 authors = ["Felix Dietze", "Johannes Nakayama"]
@@ -114,7 +114,7 @@ For a submission to be shown on the front-page, it needs to receive at least two
 | [2049 4022]      |           103 |        0.000027 |                   0.999998 |        262623 |         0.005485 |
 | [4103 6015]      |             6 |        0.000002 |                   1.000000 |         28574 |         0.000597 |
 
-![Histogram](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/submission_and_votes_distribution_over_score_intervals.svg)
+![Histogram](submission_and_votes_distribution_over_score_intervals.svg)
 
 We observe that almost half of all submissions did not get any upvote at all (score = 1). It's also interesting to see that most votes get absorbed by few submissions which are on the frontpage (score 64-1024).
 
@@ -178,7 +178,7 @@ It means that the submissions on the front-page are basically ordered by their n
 
 Now let's imagine a front-page where all submissions have **exactly the same quality** and were submitted at **exactly the same time**. The front-page would just sort the submissions by their number of votes because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
 
-![Positive Feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank".](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
+![Positive Feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank".](feedback-loop.svg)
 
 We define a view as a click by a registered user on a submission, so the user sees the submitted content. For [Ask HN](https://news.ycombinator.com/ask), the content would be the comments page. We only look at registered users, because these views are the only ones that can lead to more upvotes.
 
@@ -186,7 +186,7 @@ If many submissions compete for upvotes, the positive feedback loop creates a ri
 
 Every user acts on their own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a distribution where higher ranks receive more views than lower ranks. The graphic was created using the [Hacker News API](https://github.com/HackerNews/API) and observing score changes over time for every rank.
 
-![Histogram of vote distribution by ranks on the front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and flattening. With a hard drop on rank 30 (page 2)](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/votehist.svg)
+![Histogram of vote distribution by ranks on the front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and flattening. With a hard drop on rank 30 (page 2)](votehist.svg)
 
 Let's imagine the just mentioned front-page in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank increases the upvote count of that specific submission and pushes it to the top of the list. Now, that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
 
@@ -230,7 +230,7 @@ rankingScore = ------------------------------------------
                                 views + 1
 ```
 
-![Balancing Positive Feedback loop. Like in in the previous diagram: three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank". Additionally to the previous diagram, there is an arrow with a minus-sign from "views" to "rank".](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/feedback-loop-balanced.svg)
+![Balancing Positive Feedback loop. Like in in the previous diagram: three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank". Additionally to the previous diagram, there is an arrow with a minus-sign from "views" to "rank".](feedback-loop-balanced.svg)
 
 To understand why this works, imagine two submissions with the same number of upvotes and a different number of views. The article with more views probably has a lower quality than the one with fewer views, because more people have viewed it without giving an upvote. So the ratio of upvotes and views is a signal of quality.
 
@@ -251,13 +251,13 @@ Here are a few plots of our early, simplified simulations. In these simulations,
 Please keep in mind that these simulations have simplified assumptions that do not correspond to reality. For example, the quality distribution is uniform and the vote distribution does not follow that of the real front page. The plots are there to show that our ideas can work. And we are currently working on creating better simulations.
 
 ### Original Hacker News formula
-![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-120). The points roughly describe a filled triangle from (0 quality,0 upvotes) over (1 quality, 0 upvotes) to about (1 quality, 40 upvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-upvote-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-120). The points roughly describe a filled triangle from (0 quality,0 upvotes) over (1 quality, 0 upvotes) to about (1 quality, 40 upvotes).](hacker-news-upvote-quality-scatterplot.png)
 
 Every point is a submission that went through the frontpage simulation. The x-axis shows its predefined quality and the y-axis its upvotes. We can see that higher quality content has the chance to reach higher scores. There are no false positives (low quality content with high score), but there are many false negatives (high quality content with low score). Some outliers have very high scores.
 
 ### Hacker News formula divided by views
 If we use our proposed formula which divides the scoreRank by views, we get the following:
-![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-35). The points roughly describe a thick fuzzy line from (0 quality,0 upvotes) to about (1 quality, 15 upvotes). There are almost no points in the area below the line (high quality, few upvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-normalized-upvote-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (0-35). The points roughly describe a thick fuzzy line from (0 quality,0 upvotes) to about (1 quality, 15 upvotes). There are almost no points in the area below the line (high quality, few upvotes).](hacker-news-normalized-upvote-quality-scatterplot.png)
 
 Now there are basically no false-negatives (high quality with low score) anymore and the upvotes correlate much better with quality.
 
@@ -389,7 +389,7 @@ We also experimented with other balancing feedback loop formulas, that have inte
 rankingScore = -(downvotes+1) * age
 ```
 
-![Scatterplot with quality on x-axis (0-1) and downvotes on y-axis (-18 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 downvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes).](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-downvotes-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and downvotes on y-axis (-18 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 downvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes).](hacker-news-downvotes-quality-scatterplot.png)
 
 Only having downvotes has very interesting properties. It's much harder to promote your own content. Also, uncertainty (few votes) gets more attention (higher rank) instead of less, like it does for upvote based systems. 
 
@@ -398,6 +398,6 @@ Only having downvotes has very interesting properties. It's much harder to promo
 rankingScore = (upvotes-views-1) * age
 ```
 
-![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (-16 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 upvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes). The shape looks very similar to the one with only downvotes.](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
+![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (-16 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 upvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes). The shape looks very similar to the one with only downvotes.](hacker-news-views-as-downvotes-quality-scatterplot.png)
 
 Interestingly, this formula seems to behave very similar to the downvote-only formula. Even though the users still have an upvote button.

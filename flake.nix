@@ -19,13 +19,12 @@
           version = "0.1.0";
           src = ./.;
           nativeBuildInputs = [
-            pkgs.bash
             pkgs.zola
           ];
 
           buildPhase = ''
             runHook preBuild
-            ${pkgs.bash}/bin/bash ./scripts/build-site.sh
+            zola build
             runHook postBuild
           '';
 

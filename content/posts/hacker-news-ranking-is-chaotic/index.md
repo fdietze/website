@@ -2,7 +2,7 @@
 title = "Hacker News Ranking is Chaotic"
 description = "A closer look at the Hacker News front-page formula and why early random votes can create chaotic ranking outcomes."
 date = 2023-04-12
-path = "2023/04/12/hacker-news-ranking-is-chaotic.html"
+aliases = ["2023/04/12/hacker-news-ranking-is-chaotic.html"]
 draft = true
 
 [extra]
@@ -25,13 +25,13 @@ It means that the submissions on the front-page are basically ordered by their n
 
 Now let's imagine a front-page where all submissions have **exactly the same quality** and were submitted at **exactly the same time**. The front-page would just sort the submissions by their number of votes because they all have the same age penalty. Higher ranked submissions get more views and therefore more upvotes, which results in an even higher rank, more views, more upvotes and so on. This is called a [positive feedback loop](https://en.wikipedia.org/wiki/Positive_feedback).
 
-![Positive Feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank".](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
+![Positive Feedback loop. Three bubbles pointing at each other in a circle with a plus-sign on the arrows: "views" points to "upvotes", which points to "rank", which points to views. A fourth bubble "age" pointing with a minus-sign at "rank".](/posts/improving-the-hacker-news-ranking-algorithm/feedback-loop.svg)
 
 If many submissions compete for upvotes, the positive feedback loop creates a rich-get-richer phenomenon. Submissions with an already high number of upvotes are likely to get even more upvotes than others.
 
 Every user acts on their own and decides when to visit the front-page and which submissions to vote on. If we imagine thousands of users looking at the front-page, the views and votes on the ranks follow a distribution where higher ranks receive more views than lower ranks. The graphic was created using the [Hacker News API](https://github.com/HackerNews/API) and observing score changes over time for every rank.
 
-![Histogram of vote distribution by ranks on the front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and flattening. With a hard drop on rank 30 (page 2)](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/votehist.svg)
+![Histogram of vote distribution by ranks on the front page. In decreasing ranks: 13%, 7%, 6%, 5%, 4%, 4%, 3% and flattening. With a hard drop on rank 30 (page 2)](/posts/improving-the-hacker-news-ranking-algorithm/votehist.svg)
 
 Let's imagine the just mentioned front-page in combination with those thousands of users, viewing and voting on the individual ranks. The first vote hitting a random rank increases the upvote count of that specific submission and pushes it to the top of the list. Now, that submission has a higher chance of receiving even more upvotes, but only because it received an upvote early.
 

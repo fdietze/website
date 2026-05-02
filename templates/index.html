@@ -1,4 +1,3 @@
-{% import "macros.html" as macros %}
 {% extends "base.html" %}
 
 {% block content %}
@@ -13,7 +12,7 @@
         {% endif %}
         <article class="post">
           <h2 class="post-title">
-            <a href="{{ macros::legacy_path(url=page.permalink, base_url=config.base_url) }}">{{ page.title }}</a>
+            <a href="{{ page.permalink | replace(from=config.base_url, to="") }}">{{ page.title }}</a>
           </h2>
           <time datetime="{{ page.date }}" class="post-meta">{{ page.date | date(format="%d %b %Y") }}</time>
           <p class="post-excerpt">{{ excerpt }}</p>
