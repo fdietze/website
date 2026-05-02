@@ -1,0 +1,90 @@
+{% import "macros.html" as macros %}
+<!DOCTYPE html>
+<html lang="{{ lang | default(value=config.default_language) }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% set meta_title = config.title ~ " | " ~ config.description %}
+    {% set meta_description = config.description %}
+    {% set canonical_url = config.base_url ~ "/" %}
+
+    {% if page is defined %}
+      {% set meta_title = page.title ~ " | " ~ config.title %}
+      {% set meta_description = page.description | default(value=config.description) %}
+      {% set canonical_url = macros::legacy_url(url=page.extra.canonical_url | default(value=page.permalink)) %}
+    {% elif section is defined and section.path != "/" %}
+      {% set meta_title = section.title ~ " | " ~ config.title %}
+      {% set meta_description = section.description | default(value=config.description) %}
+      {% set canonical_url = section.permalink %}
+    {% endif %}
+
+    <title>{% block title %}{{ meta_title }}{% endblock title %}</title>
+    <meta name="description" content="{% block meta_description %}{{ meta_description }}{% endblock meta_description %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ canonical_url }}{% endblock canonical_url %}">
+    <link rel="license" href="{{ config.extra.content_license_url }}">
+    <link rel="alternate" type="application/atom+xml" href="{{ get_url(path='feed.xml', trailing_slash=false) }}" title="{{ config.title }}">
+    <link rel="stylesheet" href="{{ get_url(path='assets/normalize.css', trailing_slash=false) }}">
+    <link rel="stylesheet" href="{{ get_url(path='assets/site.css', trailing_slash=false) }}">
+
+    <meta property="og:title" content="{% if page is defined %}{{ page.title }}{% else %}{{ config.title }}{% endif %}">
+    <meta property="og:description" content="{{ meta_description }}">
+    <meta property="og:type" content="{% if page is defined %}article{% else %}website{% endif %}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:site_name" content="{{ config.title }}">
+    <meta name="twitter:card" content="summary">
+
+    {% if page is defined and page.extra.math %}
+      <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [["\\(", "\\)"]],
+            displayMath: [["\\[", "\\]"], ["$$", "$$"]]
+          }
+        };
+      </script>
+      <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    {% endif %}
+
+    {% if config.extra.goatcounter_url and config.extra.goatcounter_script %}
+      <script
+        data-goatcounter="{{ config.extra.goatcounter_url }}"
+        async
+        src="{{ config.extra.goatcounter_script }}">
+      </script>
+    {% endif %}
+  </head>
+  <body>
+    <div class="container">
+      <header class="masthead">
+        <div class="masthead-title">
+          <a href="/" title="Home">{{ config.title }}</a>
+          {% if config.extra.tagline %}
+            <small class="tagline">{{ config.extra.tagline }}</small>
+          {% endif %}
+        </div>
+        <ul class="social-icons social-icons-top">
+          {% for link in config.extra.social_links %}
+            <li class="social-icon-item">
+              <a class="social-icon" href="{{ link.url }}" target="_blank" rel="noreferrer" aria-label="{{ link.title }}" title="{{ link.title }}">
+                {% if link.icon == "mail" %}
+                  {% include "icons/mail.html" %}
+                {% elif link.icon == "twitter" %}
+                  {% include "icons/twitter.html" %}
+                {% elif link.icon == "github" %}
+                  {% include "icons/github.html" %}
+                {% else %}
+                  <span class="social-icon-fallback">{{ link.title }}</span>
+                {% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </header>
+
+      <main>
+        {% block content %}{% endblock content %}
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,7 @@
-_site
+public
+.direnv
+.codex
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
-vendor
+result

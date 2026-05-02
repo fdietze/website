@@ -1,10 +1,14 @@
----
-title: Human Alignment Technology
-excerpt: Human alignment, the process of establishing shared understanding among individuals, is crucial for effective collaboration and organization. It is essential for civilizations to flourish.
-math: false
-author: [Felix Dietze]
-canonical_url: https://social-protocols.org/human-alignment-technology/
----
++++
+title = "Human Alignment Technology"
+description = "Human alignment, the process of establishing shared understanding among individuals, is crucial for effective collaboration and organization. It is essential for civilizations to flourish."
+date = 2023-06-02
+path = "2023/06/02/human-alignment-technology.html"
+
+[extra]
+authors = ["Felix Dietze"]
+math = false
+canonical_url = "https://social-protocols.org/human-alignment-technology/"
++++
 
 ![AI generated image: A group of people sitting and collectively imagining a distant city made of colors and light.](/assets/2023-06-02-human-alignment-technology/collective.png)
 

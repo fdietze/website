@@ -1,0 +1,41 @@
+base_url = "https://felx.me"
+title = "Felix Dietze's blog"
+description = "Thoughts by Felix Dietze"
+default_language = "en"
+author = "Felix Dietze"
+compile_sass = false
+build_search_index = false
+generate_feeds = true
+feed_filenames = ["feed.xml"]
+minify_html = false
+
+[markdown]
+highlight_code = true
+highlight_theme = "css"
+smart_punctuation = true
+
+[slugify]
+paths = "safe"
+taxonomies = "safe"
+anchors = "on"
+
+[extra]
+tagline = ""
+goatcounter_url = "https://felx.goatcounter.com/count"
+goatcounter_script = "https://gc.zgo.at/count.js"
+content_license_url = "https://creativecommons.org/licenses/by/4.0/"
+
+[[extra.social_links]]
+title = "Email"
+icon = "mail"
+url = "mailto:mail@felx.me"
+
+[[extra.social_links]]
+title = "Twitter"
+icon = "twitter"
+url = "https://twitter.com/felixdietze"
+
+[[extra.social_links]]
+title = "GitHub"
+icon = "github"
+url = "https://github.com/fdietze"

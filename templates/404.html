@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found | {{ config.title }}{% endblock title %}
+{% block meta_description %}The requested page could not be found.{% endblock meta_description %}
+{% block canonical_url %}{{ config.base_url }}/404.html{% endblock canonical_url %}
+
+{% block content %}
+  <section class="not-found">
+    <h1>404</h1>
+    <p><strong>Page not found :(</strong></p>
+    <p>The requested page could not be found.</p>
+  </section>
+{% endblock content %}

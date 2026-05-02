@@ -1,8 +1,12 @@
----
-title: Improving the Hacker News Ranking Algorithm
-excerpt: In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws.
-author: [Felix Dietze, Johannes Nakayama]
----
++++
+title = "Improving the Hacker News Ranking Algorithm"
+description = "In our opinion, the goal of Hacker News (HN) is to find the highest quality submissions (according to its community) and show them on the front-page. While the current ranking algorithm seems to meet this requirement at first glance, we identified two inherent flaws."
+date = 2021-08-29
+path = "2021/08/29/improving-the-hacker-news-ranking-algorithm.html"
+
+[extra]
+authors = ["Felix Dietze", "Johannes Nakayama"]
++++
 
 *Update: [Comments on Hacker News](https://news.ycombinator.com/item?id=28391659)*
 
@@ -397,4 +401,3 @@ rankingScore = (upvotes-views-1) * age
 ![Scatterplot with quality on x-axis (0-1) and upvotes on y-axis (-16 - 0). The points roughly describe a thick fuzzy line from (0 quality,-11 upvotes) to about (1 quality, -3 downvotes). There are almost no points in the area below the line (high quality, many downvotes). The shape looks very similar to the one with only downvotes.](/assets/2021-08-29-improving-the-hacker-news-ranking-algorithm/hacker-news-views-as-downvotes-quality-scatterplot.png)
 
 Interestingly, this formula seems to behave very similar to the downvote-only formula. Even though the users still have an upvote button.
-

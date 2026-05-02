@@ -1,8 +1,13 @@
----
-title: Hacker News Ranking is Chaotic
-excerpt: ...
-author: [Felix Dietze, Johannes Nakayama]
----
++++
+title = "Hacker News Ranking is Chaotic"
+description = "A closer look at the Hacker News front-page formula and why early random votes can create chaotic ranking outcomes."
+date = 2023-04-12
+path = "2023/04/12/hacker-news-ranking-is-chaotic.html"
+draft = true
+
+[extra]
+authors = ["Felix Dietze", "Johannes Nakayama"]
++++
 
 The new-page is showing the latest submissions, ordered by submission time. To calculate the front-page, the algorithm takes the newest 1500 submissions which have at least two upvotes, applies the ranking formula and sorts by the resulting value. Here is the [formula](https://medium.com/hacking-and-gonzo/how-hacker-news-ranking-algorithm-works-1d9b0cf2c08d):
 

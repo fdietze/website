@@ -1,10 +1,15 @@
----
-title: Improving the Hacker News Ranking Algorithm - Part 2
-excerpt: In this follow-up to our first proposal to improve the Hacker News ranking formula, we address the feedback that we received from the Hacker News community. Our new approach estimates quality as the ratio of upvotes to expected upvotes. We include an algorithm of the method that we developed.
-math: true
-author: [Felix Dietze, Johannes Nakayama]
-draft: true
----
++++
+title = "Improving the Hacker News Ranking Algorithm - Part 2"
+description = "A follow-up on improving the Hacker News ranking formula that addresses community feedback and proposes estimating quality as the ratio of upvotes to expected upvotes."
+date = 2021-09-08
+draft = false
+path = "2021/09/08/improving-the-hacker-news-ranking-algorithm-part-2.html"
+
+[extra]
+authors = ["Felix Dietze", "Johannes Nakayama"]
+math = true
+listed = false
++++
 
 <!--
 TODO:
@@ -461,4 +466,3 @@ TODO: links to their websites
 https://deliberati.gitlab.io/
 https://canonicaldebatelab.com/
 //-->
-

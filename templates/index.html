@@ -1,0 +1,24 @@
+{% import "macros.html" as macros %}
+{% extends "base.html" %}
+
+{% block content %}
+  {% set posts_section = get_section(path="posts/_index.md") %}
+  <section class="posts">
+    {% for page in posts_section.pages %}
+      {% if page.extra.listed | default(value=true) %}
+        {% if page.description and page.description != "..." %}
+          {% set excerpt = page.description %}
+        {% else %}
+          {% set excerpt = page.content | striptags | truncate(length=240) %}
+        {% endif %}
+        <article class="post">
+          <h2 class="post-title">
+            <a href="{{ macros::legacy_path(url=page.permalink, base_url=config.base_url) }}">{{ page.title }}</a>
+          </h2>
+          <time datetime="{{ page.date }}" class="post-meta">{{ page.date | date(format="%d %b %Y") }}</time>
+          <p class="post-excerpt">{{ excerpt }}</p>
+        </article>
+      {% endif %}
+    {% endfor %}
+  </section>
+{% endblock content %}
