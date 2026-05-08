@@ -3,13 +3,19 @@
 {% block content %}
   <article class="post">
     <h1 class="post-title">{{ page.title }}</h1>
-    <small class="post-meta">
-      <time datetime="{{ page.date }}">{{ page.date | date(format="%d %b %Y") }}</time>
-      {% if page.extra.authors %}
-        <span class="meta-sep">&middot;</span>
-        {{ page.extra.authors | join(sep=", ") }}
-      {% endif %}
-    </small>
+    {% if page.date or page.extra.authors %}
+      <small class="post-meta">
+        {% if page.date %}
+          <time datetime="{{ page.date }}">{{ page.date | date(format="%d %b %Y") }}</time>
+        {% endif %}
+        {% if page.date and page.extra.authors %}
+          <span class="meta-sep">&middot;</span>
+        {% endif %}
+        {% if page.extra.authors %}
+          {{ page.extra.authors | join(sep=", ") }}
+        {% endif %}
+      </small>
+    {% endif %}
 
     {{ page.content | safe }}
   </article>

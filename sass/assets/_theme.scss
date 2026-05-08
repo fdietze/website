@@ -213,6 +213,7 @@ abbr[title] {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
   padding-top: var(--spacer);
   padding-bottom: var(--spacer);
@@ -231,6 +232,18 @@ abbr[title] {
 
 .masthead-title .tagline {
   opacity: 0.5;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.site-nav a {
+  color: var(--body-color);
 }
 
 .posts .post {
